@@ -1,0 +1,15 @@
+.*
+
+target/
+bin/
+
+*.jar
+
+*.zip
+
+*.rar
+
+*.bin
+!.gitignore
+!Release/words.bin
+!Release/Colibri.jar

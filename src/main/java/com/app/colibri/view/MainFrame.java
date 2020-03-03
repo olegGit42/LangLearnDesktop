@@ -1,0 +1,47 @@
+package com.app.colibri.view;
+
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.event.WindowListener;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+public class MainFrame extends JFrame {
+	private static final long serialVersionUID = 6583031504249305339L;
+
+	@Autowired
+	@Qualifier("mainFrameListener")
+	private WindowListener windowListener;
+
+	public MainFrame() {
+		super();
+	}
+
+	public MainFrame(String title) {
+		super(title);
+	}
+
+	public void init() {
+		final String imgPath = "colibri_icon.png";
+		this.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getClassLoader().getResource(imgPath)));
+
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.pack();
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		this.addWindowListener(windowListener);
+		this.setVisible(true);
+	}
+
+	public void setUpScrollPane(JScrollPane upScrollPane) {
+		this.add(upScrollPane, BorderLayout.NORTH);
+	}
+
+	public void setDownScrollPane(JScrollPane downScrollPane) {
+		this.add(downScrollPane, BorderLayout.CENTER);
+	}
+
+}

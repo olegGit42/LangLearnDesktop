@@ -1,5 +1,7 @@
 package com.app.colibri.view;
 
+import static com.app.colibri.controller.WordController.getBoxInfo;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -8,6 +10,8 @@ import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,7 +57,7 @@ public class GUI {
 	public GUI() {
 
 		// __________________________________________________________________________________________________________________________________
-		// --------------------------------------------------[Верхняя панель]
+		// --------------------------------------------------[Upper panel]
 
 		JPanel inputWordPanel = new JPanel();
 
@@ -125,7 +129,7 @@ public class GUI {
 		});
 
 		// __________________________________________________________________________________________________________________________________
-		// --------------------------------------------------[Нижняя панель]
+		// --------------------------------------------------[Lower panel]
 
 		JPanel mainPanel = new JPanel();
 
@@ -133,40 +137,40 @@ public class GUI {
 
 		// --------------------------------------------------[1]
 
-		JPanel repeate = new JPanel(new BorderLayout());
+		JPanel repeat = new JPanel(new BorderLayout());
 
-		// ----------[repeate1_begin]
+		// ----------[repeate_begin]
 
 		List<Word> repeatedWordList = new ArrayList<Word>();
 
-		TableModel modelRepeate1 = new RepeateTableModel(repeatedWordList);
-		JTable tableRepeate1 = new JTable(modelRepeate1);
-		tableRepeate1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tableRepeate1.setRowSorter(new TableRowSorter(modelRepeate1));
-		tableRepeate1.setAutoCreateRowSorter(true);
+		TableModel modelRepeate = new RepeateTableModel(repeatedWordList);
+		JTable tableRepeate = new JTable(modelRepeate);
+		tableRepeate.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableRepeate.setRowSorter(new TableRowSorter(modelRepeate));
+		tableRepeate.setAutoCreateRowSorter(true);
 
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-		tableRepeate1.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-		tableRepeate1.getColumnModel().getColumn(0).setMaxWidth(50);
+		tableRepeate.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		tableRepeate.getColumnModel().getColumn(0).setMaxWidth(50);
 
-		tableRepeate1.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+		tableRepeate.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
 
-		tableRepeate1.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-		tableRepeate1.getColumnModel().getColumn(2).setMaxWidth(60);
+		tableRepeate.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+		tableRepeate.getColumnModel().getColumn(2).setMaxWidth(60);
 
-		tableRepeate1.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-		tableRepeate1.getColumnModel().getColumn(3).setMaxWidth(60);
+		tableRepeate.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+		tableRepeate.getColumnModel().getColumn(3).setMaxWidth(60);
 
-		JScrollPane scrollPaneTableRepeate1 = new JScrollPane(tableRepeate1);
-		repeate.add(scrollPaneTableRepeate1, BorderLayout.CENTER);
+		JScrollPane scrollPaneTableRepeate = new JScrollPane(tableRepeate);
+		repeat.add(scrollPaneTableRepeate, BorderLayout.CENTER);
 
 		JButton refreshRepeate = new JButton("Refresh");
-		repeate.add(refreshRepeate, BorderLayout.NORTH);
+		repeat.add(refreshRepeate, BorderLayout.NORTH);
 
 		Timer timer = new Timer(3 * 1000, (e -> {
 			if (repeatedWordList.isEmpty()) {
-				if (System.currentTimeMillis() > WordController.minRepeateTime) {
+				if (System.currentTimeMillis() >= WordController.minRepeateTime) {
 					add.setBackground(Color.GREEN);
 					inputWordPanel.setBackground(Color.GREEN);
 					Toolkit.getDefaultToolkit().beep();
@@ -175,37 +179,37 @@ public class GUI {
 		}));
 		timer.start();
 
-		JPanel southRepeatePanel1 = new JPanel();
-		repeate.add(southRepeatePanel1, BorderLayout.SOUTH);
+		JPanel southRepeatePanel = new JPanel();
+		repeat.add(southRepeatePanel, BorderLayout.SOUTH);
 
 		JPanel labelsRrepeateLeft = new JPanel();
 		labelsRrepeateLeft.setLayout(new BoxLayout(labelsRrepeateLeft, BoxLayout.Y_AXIS));
-		southRepeatePanel1.add(labelsRrepeateLeft);
+		southRepeatePanel.add(labelsRrepeateLeft);
 
-		JLabel wordRep1 = new JLabel("Word");
-		wordRep1.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+		JLabel wordRep = new JLabel("Word");
+		wordRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(2));
-		labelsRrepeateLeft.add(wordRep1);
+		labelsRrepeateLeft.add(wordRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(3));
 
-		JLabel translateRep1 = new JLabel("Translate");
-		translateRep1.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-		labelsRrepeateLeft.add(translateRep1);
+		JLabel translateRep = new JLabel("Translate");
+		translateRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+		labelsRrepeateLeft.add(translateRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(3));
 
-		JLabel boxRep1 = new JLabel("Box");
-		boxRep1.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-		labelsRrepeateLeft.add(boxRep1);
+		JLabel boxRep = new JLabel("Box");
+		boxRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+		labelsRrepeateLeft.add(boxRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(3));
 
-		JLabel newBoxRep1 = new JLabel("New box");
-		newBoxRep1.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-		labelsRrepeateLeft.add(newBoxRep1);
+		JLabel newBoxRep = new JLabel("New box");
+		newBoxRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+		labelsRrepeateLeft.add(newBoxRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(6));
 
 		JPanel labelsRrepeateCenter = new JPanel();
 		labelsRrepeateCenter.setLayout(new BoxLayout(labelsRrepeateCenter, BoxLayout.Y_AXIS));
-		southRepeatePanel1.add(labelsRrepeateCenter);
+		southRepeatePanel.add(labelsRrepeateCenter);
 
 		JTextField wordRepText = new JTextField(40);
 		wordRepText.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -230,10 +234,18 @@ public class GUI {
 		newBoxText.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		labelsRrepeateCenter.add(newBoxText);
 		newBoxText.setSelectedIndex(-1);
+		newBoxText.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					newBoxText.setSelectedIndex(0);
+				}
+			}
+		});
 
 		JPanel labelsRepeateRight = new JPanel();
 		labelsRepeateRight.setLayout(new BoxLayout(labelsRepeateRight, BoxLayout.Y_AXIS));
-		southRepeatePanel1.add(labelsRepeateRight);
+		southRepeatePanel.add(labelsRepeateRight);
 
 		JButton bShowRep = new JButton("Show");
 		bShowRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -265,10 +277,11 @@ public class GUI {
 								translate = translate + "| [copy]: " + WordController.allWordsList.get(i).getTranslate();
 							}
 							translateRepText.setText(translate);
-							boxValueRep.setText(" " + String.valueOf(WordController.allWordsList.get(i).getBox()) + " | "
-									+ WordController.repeatPeriod[WordController.allWordsList.get(i).getBox()]);
-							if (WordController.allWordsList.get(i).getBox() + 1 < newBoxText.getItemCount() - 1) {
+							boxValueRep.setText(" " + getBoxInfo(WordController.allWordsList.get(i)));
+							if (WordController.allWordsList.get(i).getBox() + 1 < newBoxText.getItemCount()) {
 								newBoxText.setSelectedIndex(WordController.allWordsList.get(i).getBox() + 1);
+							} else if (WordController.allWordsList.get(i).getBox() == 7) {
+								newBoxText.setSelectedIndex(7);
 							} else {
 								newBoxText.setSelectedIndex(-1);
 							}
@@ -283,14 +296,15 @@ public class GUI {
 				add.setBackground(null);
 				inputWordPanel.setBackground(null);
 				GUIController.repeateWords(repeatedWordList);
-				tableRepeate1.revalidate();
+				tableRepeate.repaint();
+				tableRepeate.revalidate();
 				try {
-					tableRepeate1.changeSelection(1, 1, false, false);
+					tableRepeate.changeSelection(1, 1, false, false);
 				} catch (Exception ex) {
 				} finally {
 					try {
-						tableRepeate1.changeSelection(0, 1, false, false);
-						wordRepText.setText(String.valueOf(tableRepeate1.getModel().getValueAt(0, 1)));
+						tableRepeate.changeSelection(0, 1, false, false);
+						wordRepText.setText(String.valueOf(tableRepeate.getModel().getValueAt(0, 1)));
 					} catch (Exception ex) {
 					}
 				}
@@ -330,14 +344,14 @@ public class GUI {
 			}
 		});
 
-		ListSelectionModel selModel = tableRepeate1.getSelectionModel();
+		ListSelectionModel selModel = tableRepeate.getSelectionModel();
 
 		selModel.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				int[] selectedRows = tableRepeate1.getSelectedRows();
+				int[] selectedRows = tableRepeate.getSelectedRows();
 				try {
-					int selIndex = tableRepeate1.getRowSorter().convertRowIndexToModel(selectedRows[0]);
-					TableModel model = tableRepeate1.getModel();
+					int selIndex = tableRepeate.getRowSorter().convertRowIndexToModel(selectedRows[0]);
+					TableModel model = tableRepeate.getModel();
 					wordRepText.setText(String.valueOf(model.getValueAt(selIndex, 1)));
 					translateRepText.setText(null);
 					boxValueRep.setText(" ");
@@ -347,11 +361,11 @@ public class GUI {
 			}
 		});
 
-		// ----------[repeate1_end]
+		// ----------[repeate_end]
 
 		JPanel boxesMain = new JPanel(new BorderLayout());
 
-		// ----------[boxes1_begin]
+		// ----------[boxes_begin]
 
 		JPanel boxes = new JPanel(new FlowLayout(JLabel.CENTER, 0, 0));
 
@@ -398,14 +412,14 @@ public class GUI {
 		JButton refreshBoxes = new RefreshButton(Box::refreshBox, tableBoxesList);
 		boxesMain.add(refreshBoxes, BorderLayout.NORTH);
 
-		// ----------[boxes1_end]
+		// ----------[boxes_end]
 
 		JPanel allWords = new JPanel(new BorderLayout());
 
-		// ----------[allWords1_begin]
+		// ----------[allWords_begin]
 
-		TableModel modelAllWords1 = new AllWordsTableModel(WordController.allWordsList);
-		JTable tableAllWords = new JTable(modelAllWords1);
+		TableModel modelAllWords = new AllWordsTableModel(WordController.allWordsList);
+		JTable tableAllWords = new JTable(modelAllWords);
 		tableAllWords.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableAllWords.setAutoCreateRowSorter(true);
 
@@ -432,18 +446,18 @@ public class GUI {
 		JButton refreshAllWords = new RefreshButton(tableAllWords);
 		allWords.add(refreshAllWords, BorderLayout.NORTH);
 
-		// ----------[allWords1_end]
+		// ----------[allWords_end]
 
 		// --------------------------------------------------[Panels_end]
 
-		JTabbedPane tabbedPane1 = new JTabbedPane();
-		mainPanel.add(tabbedPane1);
-		tabbedPane1.setPreferredSize(new Dimension(800, 600));
-		tabbedPane1.add("Repeate", repeate);
-		tabbedPane1.add("Bad remembered words", BadRememberWordChartFactory.chartPanelWithButton);
-		tabbedPane1.add("Boxes", boxesMain);
-		tabbedPane1.add("All words", allWords);
-		tabbedPane1.add("Editor", new EditPanel());
+		JTabbedPane tabbedPane = new JTabbedPane();
+		mainPanel.add(tabbedPane);
+		tabbedPane.setPreferredSize(new Dimension(800, 600));
+		tabbedPane.add("Repeat", repeat);
+		tabbedPane.add("Bad remembered words", BadRememberWordChartFactory.chartPanelWithButton);
+		tabbedPane.add("Boxes", boxesMain);
+		tabbedPane.add("All words", allWords);
+		tabbedPane.add("Editor", new EditPanel());
 
 		MainFrame mainFrame = AppRun.appContext.getBean("mainFrame", MainFrame.class);
 		mainFrame.setUpScrollPane(new JScrollPane(inputWordWithSave));

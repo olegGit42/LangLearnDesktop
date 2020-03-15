@@ -15,12 +15,14 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import com.app.colibri.model.Word;
+import com.app.colibri.view.panels.EditPanel;
 
 public class GUIController {
+
 	public static void repeateWords(final List<Word> repeatedWordList) {
 		repeatedWordList.clear();
 		final long now = System.currentTimeMillis();
-		allWordsList.stream().filter(word -> now > getRoundedTime(word.getRegTime() + getTimeDelta(word.getBox())))
+		allWordsList.stream().filter(word -> now >= getRoundedTime(word.getRegTime() + getTimeDelta(word.getBox())))
 				.forEach(repeatedWordList::add);
 	}
 
@@ -30,14 +32,30 @@ public class GUIController {
 				.sorted(Comparator.comparingInt(Word::getRepeateIndicator).reversed()).forEach(badRememberWordList::add);
 	}
 
-	public static void searchWords(final List<Word> serachWordList, final String str) {
+	public static void searchWords(final List<Word> serachWordList, final String str, final boolean isRu) {
 		serachWordList.clear();
+		EditPanel.clearWordsCount();
 		final String strFinal = str == null || str.trim() == "" ? null : str.trim().toUpperCase();
 		allWordsList.stream()
 				.filter(word -> strFinal == null || word.getWord().toUpperCase().contains(strFinal)
-						|| word.getTranslate().toUpperCase().contains(strFinal))
-				.sorted((w1, w2) -> w1.getWord().toUpperCase().compareTo(w2.getWord().toUpperCase()))
-				.forEach(serachWordList::add);
+						|| word.getTranslate().toUpperCase().contains(strFinal) || String.valueOf(word.getId()).equals(strFinal))
+				.sorted((w1, w2) -> compareWords(w1, w2, isRu)).forEach(word -> {
+					EditPanel.incrementWordsCount(word);
+					serachWordList.add(word);
+				});
+	}
+
+	public static int compareWords(Word w1, Word w2, boolean isRu) {
+		if (isRu) {
+			return fixUpperYoForCompare(w1.getTranslate().toUpperCase())
+					.compareTo(fixUpperYoForCompare(w2.getTranslate().toUpperCase()));
+		} else {
+			return w1.getWord().toUpperCase().compareTo(w2.getWord().toUpperCase());
+		}
+	}
+
+	public static String fixUpperYoForCompare(String str) {
+		return str.startsWith("Ё") ? "ЕЯЯ" + str : str;
 	}
 
 	public static String getFromClipboard() {

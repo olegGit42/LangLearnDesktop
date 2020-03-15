@@ -19,7 +19,10 @@ public class RefreshButton extends JButton {
 		super("Refresh");
 		table = p_table;
 
-		this.addActionListener(e -> table.revalidate());
+		this.addActionListener(e -> {
+			table.repaint();
+			table.revalidate();
+		});
 	}
 
 	public RefreshButton(FuncVoid p_funcVoid) {
@@ -36,7 +39,10 @@ public class RefreshButton extends JButton {
 
 		this.addActionListener(e -> {
 			funcVoid.doIt();
-			tableList.forEach(JTable::revalidate);
+			tableList.forEach(table -> {
+				table.repaint();
+				table.revalidate();
+			});
 		});
 	}
 

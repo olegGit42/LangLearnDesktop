@@ -4,7 +4,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,6 +29,8 @@ public class WordController {
 	public static long month_6_ms = month_ms * 6;
 
 	public static long minRepeateTime = Long.MAX_VALUE;
+	public static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+	public static Date date = new Date();
 
 	static {
 		repeatPeriod = new String[8];
@@ -114,7 +120,12 @@ public class WordController {
 	}
 
 	public static long getRoundedTime(final long time) {
-		return (time / 100_000) * 100_000;
+		try {
+			date.setTime(time);
+			return dateFormat.parse(dateFormat.format(date)).getTime();
+		} catch (ParseException e) {
+			return time;
+		}
 	}
 
 	public static void restoreCreationTime(final Word word) {
@@ -128,6 +139,10 @@ public class WordController {
 			// System.out.println(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new
 			// Date(word.getCreationTime())));
 		}
+	}
+
+	public static String getBoxInfo(Word word) {
+		return String.valueOf(word.getBox()) + " | " + WordController.repeatPeriod[word.getBox()];
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.app.colibri.view.panels;
 
+import static com.app.colibri.controller.WordController.getBoxInfo;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -10,6 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -19,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -33,6 +38,13 @@ import com.app.colibri.view.listeners.TextFieldClipboardMouseAdapter;
 
 @SuppressWarnings("serial")
 public class EditPanel extends JPanel {
+	public static final int[] wordsCountArray = new int[8];
+	public static int wordsCount;
+
+	public static int getWordsCount() {
+		return wordsCount;
+	}
+
 	private JTable table;
 	private JTextField tfFindWord;
 	private JTextField tfWord;
@@ -44,6 +56,21 @@ public class EditPanel extends JPanel {
 	private List<Word> searchList = new ArrayList<>();
 
 	private EditState editState = EditState.READ;
+	private JTextField tfCreationDate;
+	private JTextField tfRepeateDate;
+	private JTextField tfBox;
+	private JTextField tfRepeateCount;
+	private JTextField tfID;
+	private JToggleButton tglbtnEn;
+	private JLabel lblCountB0;
+	private JLabel lblCountB1;
+	private JLabel lblCountB2;
+	private JLabel lblCountB3;
+	private JLabel lblCountB4;
+	private JLabel lblCountB5;
+	private JLabel lblCountB6;
+	private JLabel lblCountB7;
+	private JLabel lblCountAll;
 
 	/**
 	 * Create the panel.
@@ -114,7 +141,7 @@ public class EditPanel extends JPanel {
 				}
 			}
 		});
-		btnEdit.setBounds(386, 104, 77, 23);
+		btnEdit.setBounds(386, 160, 77, 23);
 		panelCenter.add(btnEdit);
 
 		JButton btnDelete = new JButton("Delete");
@@ -139,7 +166,7 @@ public class EditPanel extends JPanel {
 
 		tfEditWord = new JTextField();
 		tfEditWord.setColumns(10);
-		tfEditWord.setBounds(84, 131, 380, 20);
+		tfEditWord.setBounds(84, 187, 380, 20);
 		panelCenter.add(tfEditWord);
 
 		tfEditWord.addMouseListener(new TextFieldClipboardMouseAdapter(tfEditWord));
@@ -147,18 +174,18 @@ public class EditPanel extends JPanel {
 		JLabel lblEditWord = new JLabel("Word");
 		lblEditWord.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEditWord.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblEditWord.setBounds(28, 133, 46, 14);
+		lblEditWord.setBounds(28, 189, 46, 14);
 		panelCenter.add(lblEditWord);
 
 		JLabel lblEditTranslate = new JLabel("Translate");
 		lblEditTranslate.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEditTranslate.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblEditTranslate.setBounds(10, 158, 64, 14);
+		lblEditTranslate.setBounds(10, 214, 64, 14);
 		panelCenter.add(lblEditTranslate);
 
 		tfEditTranslate = new JTextField();
 		tfEditTranslate.setColumns(10);
-		tfEditTranslate.setBounds(84, 156, 380, 20);
+		tfEditTranslate.setBounds(84, 212, 380, 20);
 		panelCenter.add(tfEditTranslate);
 
 		tfEditTranslate.addMouseListener(new TextFieldClipboardMouseAdapter(tfEditTranslate));
@@ -172,25 +199,199 @@ public class EditPanel extends JPanel {
 		JLabel lblEdit = new JLabel("Edited");
 		lblEdit.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblEdit.setHorizontalAlignment(SwingConstants.CENTER);
-		lblEdit.setBounds(238, 109, 46, 14);
+		lblEdit.setBounds(238, 165, 46, 14);
 		panelCenter.add(lblEdit);
+
+		JLabel lblCreationDate = new JLabel("Creation date");
+		lblCreationDate.setHorizontalAlignment(SwingConstants.LEFT);
+		lblCreationDate.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCreationDate.setBounds(84, 89, 77, 14);
+		panelCenter.add(lblCreationDate);
+
+		tfCreationDate = new JTextField();
+		tfCreationDate.setEditable(false);
+		tfCreationDate.setColumns(10);
+		tfCreationDate.setBounds(164, 87, 105, 20);
+		panelCenter.add(tfCreationDate);
+
+		JLabel lblRepeateDate = new JLabel("Repeat date");
+		lblRepeateDate.setHorizontalAlignment(SwingConstants.LEFT);
+		lblRepeateDate.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblRepeateDate.setBounds(84, 113, 77, 14);
+		panelCenter.add(lblRepeateDate);
+
+		tfRepeateDate = new JTextField();
+		tfRepeateDate.setEditable(false);
+		tfRepeateDate.setColumns(10);
+		tfRepeateDate.setBounds(164, 111, 105, 20);
+		panelCenter.add(tfRepeateDate);
+
+		JLabel lblBox = new JLabel("Box");
+		lblBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblBox.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblBox.setBounds(305, 113, 77, 14);
+		panelCenter.add(lblBox);
+
+		tfBox = new JTextField();
+		tfBox.setEditable(false);
+		tfBox.setColumns(10);
+		tfBox.setBounds(386, 111, 78, 20);
+		panelCenter.add(tfBox);
+
+		JLabel lblRepeateCount = new JLabel("Repeat count");
+		lblRepeateCount.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblRepeateCount.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblRepeateCount.setBounds(287, 89, 95, 14);
+		panelCenter.add(lblRepeateCount);
+
+		tfRepeateCount = new JTextField();
+		tfRepeateCount.setEditable(false);
+		tfRepeateCount.setColumns(10);
+		tfRepeateCount.setBounds(386, 87, 78, 20);
+		panelCenter.add(tfRepeateCount);
+
+		JLabel lblID = new JLabel("ID");
+		lblID.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblID.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblID.setBounds(28, 10, 46, 14);
+		panelCenter.add(lblID);
+
+		tfID = new JTextField();
+		tfID.setEditable(false);
+		tfID.setColumns(10);
+		tfID.setBounds(84, 8, 50, 20);
+		panelCenter.add(tfID);
+
+		JLabel lblBoxCount = new JLabel("Box");
+		lblBoxCount.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblBoxCount.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblBoxCount.setBounds(28, 273, 46, 14);
+		panelCenter.add(lblBoxCount);
+
+		JLabel lblCount = new JLabel("Count");
+		lblCount.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblCount.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCount.setBounds(28, 292, 46, 14);
+		panelCenter.add(lblCount);
+
+		JLabel lbl0 = new JLabel("0");
+		lbl0.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl0.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl0.setBounds(84, 273, 40, 14);
+		panelCenter.add(lbl0);
+
+		lblCountB0 = new JLabel("0");
+		lblCountB0.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB0.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB0.setBounds(84, 293, 40, 14);
+		panelCenter.add(lblCountB0);
+
+		JLabel lbl3 = new JLabel("3");
+		lbl3.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl3.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl3.setBounds(210, 273, 40, 14);
+		panelCenter.add(lbl3);
+
+		JLabel lbl2 = new JLabel("2");
+		lbl2.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl2.setBounds(168, 273, 40, 14);
+		panelCenter.add(lbl2);
+
+		JLabel lbl1 = new JLabel("1");
+		lbl1.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl1.setBounds(125, 273, 40, 14);
+		panelCenter.add(lbl1);
+
+		lblCountB1 = new JLabel("0");
+		lblCountB1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB1.setBounds(125, 293, 40, 14);
+		panelCenter.add(lblCountB1);
+
+		lblCountB2 = new JLabel("0");
+		lblCountB2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB2.setBounds(168, 293, 40, 14);
+		panelCenter.add(lblCountB2);
+
+		lblCountB3 = new JLabel("0");
+		lblCountB3.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB3.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB3.setBounds(210, 293, 40, 14);
+		panelCenter.add(lblCountB3);
+
+		JLabel lbl4 = new JLabel("4");
+		lbl4.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl4.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl4.setBounds(251, 273, 40, 14);
+		panelCenter.add(lbl4);
+
+		lblCountB4 = new JLabel("0");
+		lblCountB4.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB4.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB4.setBounds(251, 293, 40, 14);
+		panelCenter.add(lblCountB4);
+
+		JLabel lblArchive = new JLabel("Archive");
+		lblArchive.setHorizontalAlignment(SwingConstants.CENTER);
+		lblArchive.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblArchive.setBounds(377, 273, 40, 14);
+		panelCenter.add(lblArchive);
+
+		JLabel lbl6 = new JLabel("6");
+		lbl6.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl6.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl6.setBounds(335, 273, 40, 14);
+		panelCenter.add(lbl6);
+
+		JLabel lbl5 = new JLabel("5");
+		lbl5.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl5.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl5.setBounds(292, 273, 40, 14);
+		panelCenter.add(lbl5);
+
+		lblCountB5 = new JLabel("0");
+		lblCountB5.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB5.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB5.setBounds(292, 293, 40, 14);
+		panelCenter.add(lblCountB5);
+
+		lblCountB6 = new JLabel("0");
+		lblCountB6.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB6.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB6.setBounds(335, 293, 40, 14);
+		panelCenter.add(lblCountB6);
+
+		lblCountB7 = new JLabel("0");
+		lblCountB7.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB7.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB7.setBounds(377, 293, 40, 14);
+		panelCenter.add(lblCountB7);
+
+		JLabel lblAll = new JLabel("All");
+		lblAll.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblAll.setBounds(424, 273, 40, 14);
+		panelCenter.add(lblAll);
+
+		lblCountAll = new JLabel("0");
+		lblCountAll.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountAll.setBounds(424, 293, 40, 14);
+		panelCenter.add(lblCountAll);
 
 		JPanel panelWest = new JPanel();
 		panelWest.setName("");
 		add(panelWest, BorderLayout.WEST);
 		panelWest.setLayout(new BorderLayout(0, 0));
 
-		GUIController.searchWords(searchList, null);
+		GUIController.searchWords(searchList, null, false);
 
-		TableModel modelAllWords1 = new SearchTableModel(searchList);
+		TableModel modelAllWords = new SearchTableModel(searchList);
 		table = new JTable();
-		table.setModel(modelAllWords1);
-
-//		table = new JTable();
-//		table.setModel(new DefaultTableModel(
-//				new Object[][] { { null, null }, { null, null }, { null, null }, { null, null }, { null, null }, },
-//				new String[] { "New column", "New column" }));
-
+		table.setModel(modelAllWords);
 		table.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		// TODO why bad after DELETION -> table.setAutoCreateRowSorter(true);
@@ -234,6 +435,20 @@ public class EditPanel extends JPanel {
 				searchWords();
 			}
 		});
+
+		tglbtnEn = new JToggleButton("En");
+		tglbtnEn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (tglbtnEn.isSelected()) {
+					tglbtnEn.setText("Ru");
+				} else {
+					tglbtnEn.setText("En");
+				}
+				searchWords();
+			}
+		});
+
+		panelFind.add(tglbtnEn);
 		panelFind.add(tfFindWord);
 		tfFindWord.setColumns(15);
 
@@ -241,14 +456,12 @@ public class EditPanel extends JPanel {
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tfFindWord.setText(null);
-				GUIController.searchWords(searchList, null);
-				table.getSelectionModel().clearSelection();
-				table.revalidate();
-				setWordInEditArea(null);
+				searchWords();
 			}
 		});
 		panelFind.add(btnClear);
 
+		showWordsCount();
 	}
 
 	private void setWordInEditArea(Word word) {
@@ -256,11 +469,22 @@ public class EditPanel extends JPanel {
 
 		final String wordStr = word == null ? null : word.getWord();
 		final String translateStr = word == null ? null : word.getTranslate();
+		final String creationDateStr = word == null ? null : WordController.dateFormat.format(new Date(word.getCreationTime()));
+		final String repeateDateStr = word == null ? null
+				: WordController.dateFormat.format(new Date(word.getRegTime() + WordController.getTimeDelta(word.getBox())));
+		final String boxStr = word == null ? null : getBoxInfo(word);
+		final String repeateCountStr = word == null ? null : String.valueOf(word.getRepeateIndicator());
+		final String idStr = word == null ? null : String.valueOf(word.getId());
 
 		tfWord.setText(wordStr);
 		tfTranslate.setText(translateStr);
 		tfEditWord.setText(wordStr);
 		tfEditTranslate.setText(translateStr);
+		tfCreationDate.setText(creationDateStr);
+		tfRepeateDate.setText(repeateDateStr);
+		tfBox.setText(boxStr);
+		tfRepeateCount.setText(repeateCountStr);
+		tfID.setText(idStr);
 	}
 
 	private boolean isDefinedWord() {
@@ -279,10 +503,34 @@ public class EditPanel extends JPanel {
 	}
 
 	private void searchWords() {
-		GUIController.searchWords(searchList, tfFindWord.getText());
+		GUIController.searchWords(searchList, tfFindWord.getText(), tglbtnEn.isSelected());
 		table.getSelectionModel().clearSelection();
+		table.repaint();
 		table.revalidate();
 		setWordInEditArea(null);
+		showWordsCount();
+	}
+
+	private void showWordsCount() {
+		lblCountB0.setText(String.valueOf(wordsCountArray[0]));
+		lblCountB1.setText(String.valueOf(wordsCountArray[1]));
+		lblCountB2.setText(String.valueOf(wordsCountArray[2]));
+		lblCountB3.setText(String.valueOf(wordsCountArray[3]));
+		lblCountB4.setText(String.valueOf(wordsCountArray[4]));
+		lblCountB5.setText(String.valueOf(wordsCountArray[5]));
+		lblCountB6.setText(String.valueOf(wordsCountArray[6]));
+		lblCountB7.setText(String.valueOf(wordsCountArray[7]));
+		lblCountAll.setText(String.valueOf(getWordsCount()));
+	}
+
+	public static void incrementWordsCount(Word word) {
+		wordsCountArray[word.getBox()]++;
+		wordsCount++;
+	}
+
+	public static void clearWordsCount() {
+		Arrays.fill(wordsCountArray, 0);
+		wordsCount = 0;
 	}
 
 	private static enum EditState {

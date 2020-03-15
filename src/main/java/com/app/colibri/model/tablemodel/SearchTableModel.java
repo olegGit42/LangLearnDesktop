@@ -1,26 +1,18 @@
 package com.app.colibri.model.tablemodel;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import javax.swing.table.AbstractTableModel;
 
 import com.app.colibri.model.Word;
 
-public class SearchTableModel implements TableModel {
-
-	private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
+@SuppressWarnings("serial")
+public class SearchTableModel extends AbstractTableModel {
 
 	private List<Word> words;
 
 	public SearchTableModel(List<Word> words) {
 		this.words = words;
-	}
-
-	public void addTableModelListener(TableModelListener listener) {
-		listeners.add(listener);
 	}
 
 	public Class<?> getColumnClass(int columnIndex) {
@@ -67,14 +59,6 @@ public class SearchTableModel implements TableModel {
 
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		return true;
-	}
-
-	public void removeTableModelListener(TableModelListener listener) {
-		listeners.remove(listener);
-	}
-
-	public void setValueAt(Object value, int rowIndex, int columnIndex) {
-
 	}
 
 }

@@ -51,7 +51,7 @@ public class AllWordsTableModel implements TableModel {
 		case 2:
 			return "Translate";
 		case 3:
-			return "Date";
+			return "Repeat date";
 		case 4:
 			return "Box";
 		case 5:

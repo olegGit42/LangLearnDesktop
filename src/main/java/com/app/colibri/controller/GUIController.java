@@ -9,7 +9,10 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -32,21 +35,30 @@ public class GUIController {
 				.sorted(Comparator.comparingInt(Word::getRepeateIndicator).reversed()).forEach(badRememberWordList::add);
 	}
 
-	public static void searchWords(final List<Word> serachWordList, final String str, final boolean isRu) {
+	public static void searchWords(final List<Word> serachWordList, final String str, final boolean isTranslate) {
+		final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+		final Date date = new Date();
 		serachWordList.clear();
 		EditPanel.clearWordsCount();
-		final String strFinal = str == null || str.trim() == "" ? null : str.trim().toUpperCase();
+		final String findStr = str == null || str.trim() == "" ? null : str.trim().toUpperCase();
 		allWordsList.stream()
-				.filter(word -> strFinal == null || word.getWord().toUpperCase().contains(strFinal)
-						|| word.getTranslate().toUpperCase().contains(strFinal) || String.valueOf(word.getId()).equals(strFinal))
-				.sorted((w1, w2) -> compareWords(w1, w2, isRu)).forEach(word -> {
+				.filter(word -> findStr == null || word.getWord().toUpperCase().contains(findStr)
+						|| word.getTranslate().toUpperCase().contains(findStr) || String.valueOf(word.getId()).equals(findStr)
+						|| dateFormat.format(setTime(date, word.getCreationTime())).equals(findStr)
+						|| ("B" + word.getBox()).equals(findStr))
+				.sorted((w1, w2) -> compareWords(w1, w2, isTranslate)).forEach(word -> {
 					EditPanel.incrementWordsCount(word);
 					serachWordList.add(word);
 				});
 	}
 
-	public static int compareWords(Word w1, Word w2, boolean isRu) {
-		if (isRu) {
+	public static Date setTime(final Date date, final long time) {
+		date.setTime(time);
+		return date;
+	}
+
+	public static int compareWords(Word w1, Word w2, boolean isTranslate) {
+		if (isTranslate) {
 			return fixUpperYoForCompare(w1.getTranslate().toUpperCase())
 					.compareTo(fixUpperYoForCompare(w2.getTranslate().toUpperCase()));
 		} else {

@@ -63,7 +63,7 @@ public class RepeateTableModel implements TableModel {
 		case 1:
 			return word.getWord();
 		case 2:
-			return WordController.repeatPeriod[word.getBox()];
+			return WordController.getRepeatPeriod(word.getBox());
 		case 3:
 			return String.valueOf(word.getBox());
 		}

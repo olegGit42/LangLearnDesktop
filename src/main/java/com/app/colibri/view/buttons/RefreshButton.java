@@ -20,6 +20,7 @@ public class RefreshButton extends JButton {
 		table = p_table;
 
 		this.addActionListener(e -> {
+			table.getSelectionModel().clearSelection();
 			table.repaint();
 			table.revalidate();
 		});
@@ -40,6 +41,7 @@ public class RefreshButton extends JButton {
 		this.addActionListener(e -> {
 			funcVoid.doIt();
 			tableList.forEach(table -> {
+				table.getSelectionModel().clearSelection();
 				table.repaint();
 				table.revalidate();
 			});

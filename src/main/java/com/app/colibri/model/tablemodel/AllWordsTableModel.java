@@ -39,7 +39,7 @@ public class AllWordsTableModel implements TableModel {
 	}
 
 	public int getColumnCount() {
-		return 6;
+		return 7;
 	}
 
 	public String getColumnName(int columnIndex) {
@@ -47,14 +47,16 @@ public class AllWordsTableModel implements TableModel {
 		case 0:
 			return "ID";
 		case 1:
-			return "Word";
+			return "Creation date";
 		case 2:
-			return "Translate";
+			return "Word";
 		case 3:
-			return "Repeat date";
+			return "Translate";
 		case 4:
-			return "Box";
+			return "Repeat date";
 		case 5:
+			return "Box";
+		case 6:
 			return "Period";
 		}
 		return "No data";
@@ -70,20 +72,24 @@ public class AllWordsTableModel implements TableModel {
 		Date date = new Date(getRoundedTime(word.getRegTime() + WordController.getTimeDelta(word.getBox())));
 		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm"); // "dd.MM.yyyy HH:mm"
 		String dateStr = dateFormat.format(date);
+		date.setTime(word.getCreationTime());
+		String creationDateStr = dateFormat.format(date);
 
 		switch (columnIndex) {
 		case 0:
 			return word.getId(); // String.valueOf(word.getId());
 		case 1:
-			return word.getWord();
+			return creationDateStr;
 		case 2:
-			return word.getTranslate();
+			return word.getWord();
 		case 3:
-			return dateStr;
+			return word.getTranslate();
 		case 4:
-			return String.valueOf(word.getBox());
+			return dateStr;
 		case 5:
-			return WordController.repeatPeriod[word.getBox()];
+			return String.valueOf(word.getBox());
+		case 6:
+			return WordController.getRepeatPeriod(word.getBox());
 		}
 		return "";
 	}

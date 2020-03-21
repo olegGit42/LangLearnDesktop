@@ -225,9 +225,9 @@ public class GUI {
 		boxValueRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		labelsRrepeateCenter.add(boxValueRep);
 
-		String[] boxPeriod = WordController.repeatPeriod.clone();
+		String[] boxPeriod = new String[WordController.repeatPeriodArray.length];
 		for (int i = 0; i < boxPeriod.length; i++) {
-			boxPeriod[i] = String.valueOf(i) + " | " + boxPeriod[i];
+			boxPeriod[i] = getBoxInfo(i);
 		}
 
 		JComboBox<String> newBoxText = new JComboBox<String>(boxPeriod);
@@ -299,14 +299,10 @@ public class GUI {
 				tableRepeate.repaint();
 				tableRepeate.revalidate();
 				try {
-					tableRepeate.changeSelection(1, 1, false, false);
+					tableRepeate.getSelectionModel().clearSelection();
+					tableRepeate.changeSelection(0, 1, false, false);
+					wordRepText.setText(String.valueOf(tableRepeate.getModel().getValueAt(0, 1)));
 				} catch (Exception ex) {
-				} finally {
-					try {
-						tableRepeate.changeSelection(0, 1, false, false);
-						wordRepText.setText(String.valueOf(tableRepeate.getModel().getValueAt(0, 1)));
-					} catch (Exception ex) {
-					}
 				}
 			}
 		});
@@ -372,31 +368,31 @@ public class GUI {
 		boxesMain.add(boxes, BorderLayout.CENTER);
 
 		// B0
-		BoxScrollPane scrollPaneTableB0 = new BoxScrollPane(new BoxesTableModel(Box.b0, "Box 0"));
+		BoxScrollPane scrollPaneTableB0 = new BoxScrollPane(new BoxesTableModel(Box.getBox(0), "Box 0"));
 		boxes.add(scrollPaneTableB0);
 
 		// B1
-		BoxScrollPane scrollPaneTableB1 = new BoxScrollPane(new BoxesTableModel(Box.b1, "Box 1"));
+		BoxScrollPane scrollPaneTableB1 = new BoxScrollPane(new BoxesTableModel(Box.getBox(1), "Box 1"));
 		boxes.add(scrollPaneTableB1);
 
 		// B2
-		BoxScrollPane scrollPaneTableB2 = new BoxScrollPane(new BoxesTableModel(Box.b2, "Box 2"));
+		BoxScrollPane scrollPaneTableB2 = new BoxScrollPane(new BoxesTableModel(Box.getBox(2), "Box 2"));
 		boxes.add(scrollPaneTableB2);
 
 		// B3
-		BoxScrollPane scrollPaneTableB3 = new BoxScrollPane(new BoxesTableModel(Box.b3, "Box 3"));
+		BoxScrollPane scrollPaneTableB3 = new BoxScrollPane(new BoxesTableModel(Box.getBox(3), "Box 3"));
 		boxes.add(scrollPaneTableB3);
 
 		// B4
-		BoxScrollPane scrollPaneTableB4 = new BoxScrollPane(new BoxesTableModel(Box.b4, "Box 4"));
+		BoxScrollPane scrollPaneTableB4 = new BoxScrollPane(new BoxesTableModel(Box.getBox(4), "Box 4"));
 		boxes.add(scrollPaneTableB4);
 
 		// B5
-		BoxScrollPane scrollPaneTableB5 = new BoxScrollPane(new BoxesTableModel(Box.b5, "Box 5"));
+		BoxScrollPane scrollPaneTableB5 = new BoxScrollPane(new BoxesTableModel(Box.getBox(5), "Box 5"));
 		boxes.add(scrollPaneTableB5);
 
 		// B6
-		BoxScrollPane scrollPaneTableB6 = new BoxScrollPane(new BoxesTableModel(Box.b6, "Box 6"));
+		BoxScrollPane scrollPaneTableB6 = new BoxScrollPane(new BoxesTableModel(Box.getBox(6), "Box 6"));
 		boxes.add(scrollPaneTableB6);
 
 		// Refresh
@@ -429,19 +425,22 @@ public class GUI {
 		tableAllWords.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 		tableAllWords.getColumnModel().getColumn(0).setMaxWidth(30);
 
-		tableAllWords.getColumnModel().getColumn(1).setMinWidth(200);
-		tableAllWords.getColumnModel().getColumn(1).setMaxWidth(200);
+		tableAllWords.getColumnModel().getColumn(1).setMaxWidth(100);
+		tableAllWords.getColumnModel().getColumn(1).setMinWidth(100);
 
-		tableAllWords.getColumnModel().getColumn(3).setMaxWidth(100);
-		tableAllWords.getColumnModel().getColumn(3).setMinWidth(100);
+		tableAllWords.getColumnModel().getColumn(2).setMinWidth(200);
+		tableAllWords.getColumnModel().getColumn(2).setMaxWidth(200);
 
-		tableAllWords.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
-		tableAllWords.getColumnModel().getColumn(4).setMaxWidth(30);
-		tableAllWords.getColumnModel().getColumn(4).setMinWidth(30);
+		tableAllWords.getColumnModel().getColumn(4).setMaxWidth(100);
+		tableAllWords.getColumnModel().getColumn(4).setMinWidth(100);
 
 		tableAllWords.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-		tableAllWords.getColumnModel().getColumn(5).setMaxWidth(50);
-		tableAllWords.getColumnModel().getColumn(5).setMinWidth(50);
+		tableAllWords.getColumnModel().getColumn(5).setMaxWidth(30);
+		tableAllWords.getColumnModel().getColumn(5).setMinWidth(30);
+
+		tableAllWords.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
+		tableAllWords.getColumnModel().getColumn(6).setMaxWidth(50);
+		tableAllWords.getColumnModel().getColumn(6).setMinWidth(50);
 
 		JButton refreshAllWords = new RefreshButton(tableAllWords);
 		allWords.add(refreshAllWords, BorderLayout.NORTH);

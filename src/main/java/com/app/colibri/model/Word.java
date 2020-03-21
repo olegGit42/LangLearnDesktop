@@ -1,10 +1,8 @@
 package com.app.colibri.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import com.app.colibri.controller.WordController;
-import com.app.colibri.model.boxstrategy.BoxStrategy;
 
 import lombok.Data;
 
@@ -30,7 +28,7 @@ public class Word implements Serializable {
 		this.id = WordController.newId.incrementAndGet();
 		this.word = word;
 		this.translate = translate;
-		Box.b0.add(this);
+		Box.getBox(0).add(this);
 		WordController.allWordsList.add(this);
 		WordController.setMinRepTime(this);
 	}
@@ -42,11 +40,12 @@ public class Word implements Serializable {
 	}
 
 	public void inctementRepeateIndicator() {
-		++repeateIndicator; // repeateIndicator = box;
-		regTime = new Date().getTime();
+		++repeateIndicator;
+		regTime = System.currentTimeMillis();
 	}
 
-	public void addToBox(BoxStrategy boxStrategy) {
-		boxStrategy.addToBox(this);
+	public void addToBox() {
+		Box.boxList.get(box).add(this);
 	}
+
 }

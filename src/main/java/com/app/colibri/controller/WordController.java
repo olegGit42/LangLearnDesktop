@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -121,7 +120,7 @@ public class WordController {
 		final long timeDelta = getTimeDelta(word.getBox());
 
 		if (timeDelta != 0L) {
-			final long repTime = getRoundedTime(word.getRegTime() + timeDelta);
+			final long repTime = getRoundedTimeToMinute(word.getRegTime() + timeDelta);
 
 			if (repTime < minRepeateTime) {
 				minRepeateTime = repTime;
@@ -129,11 +128,15 @@ public class WordController {
 		}
 	}
 
-	public static long getRoundedTime(final long time) {
+	public static long getRoundedTimeToMinute(final long time) {
+		return getRoundedTime(date, time, dateFormat);
+	}
+
+	public static long getRoundedTime(final Date date, final long time, final DateFormat dateFormat) {
 		try {
 			date.setTime(time);
 			return dateFormat.parse(dateFormat.format(date)).getTime();
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			return time;
 		}
 	}

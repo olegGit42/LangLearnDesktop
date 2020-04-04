@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -39,6 +38,7 @@ import javax.swing.table.TableRowSorter;
 
 import com.app.colibri.controller.AppRun;
 import com.app.colibri.controller.GUIController;
+import com.app.colibri.controller.NotificationSound;
 import com.app.colibri.controller.WordController;
 import com.app.colibri.model.Box;
 import com.app.colibri.model.Word;
@@ -173,7 +173,8 @@ public class GUI {
 				if (System.currentTimeMillis() >= WordController.minRepeateTime) {
 					add.setBackground(Color.GREEN);
 					inputWordPanel.setBackground(Color.GREEN);
-					Toolkit.getDefaultToolkit().beep();
+					// TODO why doesn't produce sound -> Toolkit.getDefaultToolkit().beep();
+					NotificationSound.beep();
 				}
 			}
 		}));

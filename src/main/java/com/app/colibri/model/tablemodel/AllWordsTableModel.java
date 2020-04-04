@@ -1,6 +1,6 @@
 package com.app.colibri.model.tablemodel;
 
-import static com.app.colibri.controller.WordController.getRoundedTime;
+import static com.app.colibri.controller.WordController.getRoundedTimeToMinute;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -69,7 +69,7 @@ public class AllWordsTableModel implements TableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 
 		Word word = words.get(rowIndex);
-		Date date = new Date(getRoundedTime(word.getRegTime() + WordController.getTimeDelta(word.getBox())));
+		Date date = new Date(getRoundedTimeToMinute(word.getRegTime() + WordController.getTimeDelta(word.getBox())));
 		DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm"); // "dd.MM.yyyy HH:mm"
 		String dateStr = dateFormat.format(date);
 		date.setTime(word.getCreationTime());

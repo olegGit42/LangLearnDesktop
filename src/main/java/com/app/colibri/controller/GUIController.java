@@ -18,6 +18,7 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import com.app.colibri.model.Word;
+import com.app.colibri.view.GUI;
 import com.app.colibri.view.panels.EditPanel;
 
 public class GUIController {
@@ -173,6 +174,13 @@ public class GUIController {
 			textField.setText(text.equals("") ? clipboard : text.concat(", ".concat(clipboard)));
 		} else {
 			textField.setText(text);
+		}
+	}
+
+	public static void updMinRepeatTime() {
+		if (GUI.repeatedWordList.isEmpty()) {
+			WordController.minRepeatTime = Long.MAX_VALUE;
+			WordController.allWordsList.forEach(WordController::setMinRepTime);
 		}
 	}
 

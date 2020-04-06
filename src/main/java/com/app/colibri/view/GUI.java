@@ -53,6 +53,8 @@ import com.app.colibri.view.panels.EditPanel;
 
 public class GUI {
 
+	public static final List<Word> repeatedWordList = new ArrayList<Word>();
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public GUI() {
 
@@ -123,7 +125,7 @@ public class GUI {
 			} else {
 				newWord.setText(newWord.getText().trim());
 				translate.setText(translate.getText().trim());
-				String recurenceTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date(WordController.minRepeateTime));
+				String recurenceTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date(WordController.minRepeatTime));
 				JOptionPane.showMessageDialog(null, recurenceTime, "Recurrence time", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
@@ -140,8 +142,6 @@ public class GUI {
 		JPanel repeat = new JPanel(new BorderLayout());
 
 		// ----------[repeate_begin]
-
-		List<Word> repeatedWordList = new ArrayList<Word>();
 
 		TableModel modelRepeate = new RepeateTableModel(repeatedWordList);
 		JTable tableRepeate = new JTable(modelRepeate);
@@ -170,7 +170,7 @@ public class GUI {
 
 		Timer timer = new Timer(3 * 1000, (e -> {
 			if (repeatedWordList.isEmpty()) {
-				if (System.currentTimeMillis() >= WordController.minRepeateTime) {
+				if (System.currentTimeMillis() >= WordController.minRepeatTime) {
 					add.setBackground(Color.GREEN);
 					inputWordPanel.setBackground(Color.GREEN);
 					// TODO why doesn't produce sound -> Toolkit.getDefaultToolkit().beep();
@@ -226,12 +226,7 @@ public class GUI {
 		boxValueRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		labelsRrepeateCenter.add(boxValueRep);
 
-		String[] boxPeriod = new String[WordController.repeatPeriodArray.length];
-		for (int i = 0; i < boxPeriod.length; i++) {
-			boxPeriod[i] = getBoxInfo(i);
-		}
-
-		JComboBox<String> newBoxText = new JComboBox<String>(boxPeriod);
+		JComboBox<String> newBoxText = new JComboBox<String>(WordController.boxPeriod);
 		newBoxText.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		labelsRrepeateCenter.add(newBoxText);
 		newBoxText.setSelectedIndex(-1);
@@ -318,8 +313,7 @@ public class GUI {
 				if (0 <= newBoxText.getSelectedIndex() && newBoxText.getSelectedIndex() <= 7) {
 					for (Word word : WordController.allWordsList) {
 						if (wordRepText.getText().trim().toLowerCase().equals(word.getWord().toLowerCase())) {
-							word.setBox(newBoxText.getSelectedIndex());
-							word.inctementRepeateIndicator();
+							word.setNewBoxAndUpdDate(newBoxText.getSelectedIndex());
 							break;
 						}
 					}
@@ -330,13 +324,8 @@ public class GUI {
 					newBoxText.setSelectedIndex(-1);
 
 					refreshRepeate.doClick();
-
 					WordController.serializeAllWordsToFile("words.bin");
-
-					if (repeatedWordList.isEmpty()) {
-						WordController.minRepeateTime = Long.MAX_VALUE;
-						WordController.allWordsList.forEach(WordController::setMinRepTime);
-					}
+					GUIController.updMinRepeatTime();
 				}
 			}
 		});

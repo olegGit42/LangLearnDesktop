@@ -20,6 +20,7 @@ public class WordController {
 	public static final AtomicInteger newId = new AtomicInteger();
 	public static final String[] repeatPeriodArray;
 	public static final long[] timeDeltaArray;
+	public static final String[] boxPeriod;
 
 	public static final long minute_ms = 60_000L;
 	public static final long hour_ms = minute_ms * 60;
@@ -28,7 +29,7 @@ public class WordController {
 	public static final long month_ms = day_ms * 30;
 	public static final long month_6_ms = month_ms * 6;
 
-	public static long minRepeateTime = Long.MAX_VALUE;
+	public static long minRepeatTime = Long.MAX_VALUE;
 	public static long minTime;
 	public static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	public static final Date date = new Date();
@@ -55,6 +56,11 @@ public class WordController {
 		timeDeltaArray[5] = week_ms * 2 - day_delta;
 		timeDeltaArray[6] = month_ms - day_delta;
 		timeDeltaArray[7] = month_6_ms - day_delta;
+
+		boxPeriod = new String[WordController.repeatPeriodArray.length];
+		for (int i = 0; i < boxPeriod.length; i++) {
+			boxPeriod[i] = getBoxInfo(i);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -122,8 +128,8 @@ public class WordController {
 		if (timeDelta != 0L) {
 			final long repTime = getRoundedTimeToMinute(word.getRegTime() + timeDelta);
 
-			if (repTime < minRepeateTime) {
-				minRepeateTime = repTime;
+			if (repTime < minRepeatTime) {
+				minRepeatTime = repTime;
 			}
 		}
 	}

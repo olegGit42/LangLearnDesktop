@@ -44,6 +44,11 @@ public class Word implements Serializable {
 		regTime = System.currentTimeMillis();
 	}
 
+	public void setNewBoxAndUpdDate(int box) {
+		setBox(box);
+		inctementRepeateIndicator();
+	}
+
 	public void addToBox() {
 		Box.boxList.get(box).add(this);
 	}

@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -73,10 +74,13 @@ public class EditPanel extends JPanel {
 	private JLabel lblCountB6;
 	private JLabel lblCountB7;
 	private JLabel lblCountAll;
+	@SuppressWarnings("rawtypes")
+	private JComboBox comboBox;
 
 	/**
 	 * Create the panel.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public EditPanel() {
 		setLayout(new BorderLayout(0, 0));
 
@@ -114,7 +118,8 @@ public class EditPanel extends JPanel {
 				editState = EditState.EDIT;
 				if (isDefinedWord()) {
 					if (tfEditWord.getText().trim().equals(tfWord.getText())
-							&& tfEditTranslate.getText().trim().equals(tfTranslate.getText())) {
+							&& tfEditTranslate.getText().trim().equals(tfTranslate.getText())
+							&& tfBox.getText().equals(String.valueOf(comboBox.getSelectedItem()))) {
 						JOptionPane.showMessageDialog(null, "No changes", "Info", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
@@ -133,6 +138,11 @@ public class EditPanel extends JPanel {
 					if (answer == JOptionPane.YES_OPTION) {
 						editedWord.setWord(tfEditWord.getText().trim());
 						editedWord.setTranslate(tfEditTranslate.getText().trim());
+						if (!tfBox.getText().equals(String.valueOf(comboBox.getSelectedItem()))) {
+							editedWord.setNewBoxAndUpdDate(comboBox.getSelectedIndex());
+							GUIController.updMinRepeatTime();
+						}
+						WordController.serializeAllWordsToFile("words.bin");
 
 						JOptionPane.showMessageDialog(null, "Successfully EDITED", "Info", JOptionPane.INFORMATION_MESSAGE);
 
@@ -155,9 +165,11 @@ public class EditPanel extends JPanel {
 							JOptionPane.YES_NO_OPTION);
 
 					if (answer == JOptionPane.YES_OPTION) {
-						JOptionPane.showMessageDialog(null, "Successfully DELETED", "Info", JOptionPane.INFORMATION_MESSAGE);
 						WordController.allWordsList.remove(editedWord);
 						searchWords();
+						GUIController.updMinRepeatTime();
+						WordController.serializeAllWordsToFile("words.bin");
+						JOptionPane.showMessageDialog(null, "Successfully DELETED", "Info", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}
 			}
@@ -266,7 +278,7 @@ public class EditPanel extends JPanel {
 
 		JPanel pnlWordsSummary = new JPanel();
 		pnlWordsSummary.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-		pnlWordsSummary.setBounds(24, 270, 440, 60);
+		pnlWordsSummary.setBounds(24, 300, 440, 60);
 		panelCenter.add(pnlWordsSummary);
 		pnlWordsSummary.setLayout(null);
 
@@ -390,6 +402,25 @@ public class EditPanel extends JPanel {
 		lblCountAll.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
+		JLabel lblEditBox = new JLabel("Box");
+		lblEditBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblEditBox.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblEditBox.setBounds(24, 240, 50, 14);
+		panelCenter.add(lblEditBox);
+
+		comboBox = new JComboBox(WordController.boxPeriod);
+		comboBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					comboBox.setSelectedIndex(0);
+				}
+			}
+		});
+		comboBox.setBounds(84, 235, 95, 25);
+		panelCenter.add(comboBox);
+		comboBox.setSelectedIndex(-1);
+
 		JPanel panelWest = new JPanel();
 		panelWest.setName("");
 		add(panelWest, BorderLayout.WEST);
@@ -487,6 +518,7 @@ public class EditPanel extends JPanel {
 		final String boxStr = word == null ? null : getBoxInfo(word);
 		final String repeateCountStr = word == null ? null : String.valueOf(word.getRepeateIndicator());
 		final String idStr = word == null ? null : String.valueOf(word.getId());
+		final int box = word == null ? -1 : word.getBox();
 
 		tfWord.setText(wordStr);
 		tfTranslate.setText(translateStr);
@@ -497,6 +529,7 @@ public class EditPanel extends JPanel {
 		tfBox.setText(boxStr);
 		tfRepeateCount.setText(repeateCountStr);
 		tfID.setText(idStr);
+		comboBox.setSelectedIndex(box);
 	}
 
 	private boolean isDefinedWord() {

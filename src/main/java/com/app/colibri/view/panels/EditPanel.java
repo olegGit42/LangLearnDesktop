@@ -5,6 +5,7 @@ import static com.app.colibri.controller.WordController.getBoxInfo;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -421,6 +423,30 @@ public class EditPanel extends JPanel {
 		panelCenter.add(comboBox);
 		comboBox.setSelectedIndex(-1);
 
+		JButton btnBoxPlus = new JButton("");
+		btnBoxPlus.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				incrementBoxSelection(1);
+			}
+		});
+		btnBoxPlus.setMargin(new Insets(2, 12, 2, 14));
+		btnBoxPlus.setIconTextGap(0);
+		btnBoxPlus.setBounds(190, 235, 25, 25);
+		panelCenter.add(btnBoxPlus);
+		btnBoxPlus.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("plus21.png")));
+
+		JButton btnBoxMinus = new JButton("");
+		btnBoxMinus.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				incrementBoxSelection(-1);
+			}
+		});
+		btnBoxMinus.setMargin(new Insets(2, 12, 2, 14));
+		btnBoxMinus.setIconTextGap(0);
+		btnBoxMinus.setBounds(220, 235, 25, 25);
+		panelCenter.add(btnBoxMinus);
+		btnBoxMinus.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("minus21.png")));
+
 		JPanel panelWest = new JPanel();
 		panelWest.setName("");
 		add(panelWest, BorderLayout.WEST);
@@ -535,7 +561,7 @@ public class EditPanel extends JPanel {
 	private boolean isDefinedWord() {
 		boolean isDefined = editedWord == null ? false
 				: tfWord.getText().equals(editedWord.getWord()) && tfTranslate.getText().equals(editedWord.getTranslate())
-						&& (editState == EditState.DELETE
+						&& comboBox.getSelectedIndex() != -1 && (editState == EditState.DELETE
 								|| (!tfEditWord.getText().trim().equals("") && !tfEditTranslate.getText().trim().equals("")));
 
 		if (!isDefined) {
@@ -566,6 +592,17 @@ public class EditPanel extends JPanel {
 		lblCountB6.setText(String.valueOf(wordsCountArray[6]));
 		lblCountB7.setText(String.valueOf(wordsCountArray[7]));
 		lblCountAll.setText(String.valueOf(getWordsCount()));
+	}
+
+	private void incrementBoxSelection(int delta) {
+		try {
+			int newIndex = comboBox.getSelectedIndex() + delta;
+			if (newIndex != -1) {
+				comboBox.setSelectedIndex(newIndex);
+			}
+		} catch (Exception e) {
+			// nothing to do
+		}
 	}
 
 	public static void incrementWordsCount(Word word) {

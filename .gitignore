@@ -1,15 +1,12 @@
 .*
-
 target/
 bin/
-
 *.jar
-
 *.zip
-
 *.rar
-
 *.bin
+*.json
 !.gitignore
 !Release/words.bin
+!Release/words.json
 !Release/Colibri.jar

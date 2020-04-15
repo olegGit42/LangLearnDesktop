@@ -110,7 +110,7 @@ public class GUI {
 
 				if (check == 0) {
 					WordController.createNewWordGUI(newWordStr, translateStr);
-					WordController.serializeAllWordsToFile("words.bin");
+					WordController.serializeAllWordsMain();
 
 					JOptionPane.showMessageDialog(null, "Successfully ADDED", "Info", JOptionPane.INFORMATION_MESSAGE);
 
@@ -324,7 +324,7 @@ public class GUI {
 					newBoxText.setSelectedIndex(-1);
 
 					refreshRepeate.doClick();
-					WordController.serializeAllWordsToFile("words.bin");
+					WordController.serializeAllWordsMain();
 					GUIController.updMinRepeatTime();
 				}
 			}

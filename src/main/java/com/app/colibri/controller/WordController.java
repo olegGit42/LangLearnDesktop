@@ -1,5 +1,6 @@
 package com.app.colibri.controller;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.app.colibri.model.Word;
+import com.app.colibri.registry.UserWordRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WordController {
 	public static int maxId;
@@ -33,6 +36,8 @@ public class WordController {
 	public static long minTime;
 	public static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	public static final Date date = new Date();
+
+	public static UserWordRegistry userWordRegistry;
 
 	static {
 		final long day_delta = hour_ms * 6;
@@ -63,42 +68,77 @@ public class WordController {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public static List<Word> unserializeAllWordsFromFile(String path) {
-		List<Word> allWordsList = new ArrayList<>();
+	public static List<Word> unserializeAllWordsMain() {
+		// return unserializeAllWordsFromFile("words.json"); // main
+		return unserializeAllWordsFromFile("words.bin"); // for compatibility
+	}
 
-		try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path))) {
-			allWordsList = (List<Word>) objectInputStream.readObject();
-		} catch (Exception e) {
-			System.err.println("Error in unserializeAllWordsFromFile(String path : " + path + ") method of "
-					+ WordController.class.getName() + " class");
-			e.printStackTrace();
+	public static void serializeAllWordsMain() {
+		serializeAllWordsToFile("words.json"); // main
+		serializeAllWordsToFile("words.bin"); // for compatibility
+	}
+
+	public static void serializeAllWordsCopy() {
+		serializeAllWordsToFile("wordsCopy.json"); // main
+		serializeAllWordsToFile("wordsCopy.bin"); // for compatibility
+	}
+
+	@SuppressWarnings("unchecked")
+	private static List<Word> unserializeAllWordsFromFile(String path) {
+		List<Word> allWordsList = new ArrayList<>();
+		WordController.userWordRegistry = new UserWordRegistry();
+		WordController.userWordRegistry.setAllUserWordsList(allWordsList);
+
+		if (path.endsWith(".bin")) {
+			try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path))) {
+				WordController.userWordRegistry.setAllUserWordsList((List<Word>) objectInputStream.readObject());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (path.endsWith(".json")) {
+			ObjectMapper mapper = new ObjectMapper();
+
+			// JSON file to Java object
+			try {
+				WordController.userWordRegistry = mapper.readValue(new File(path), UserWordRegistry.class);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
-		// final List<Word> allWordsListFinal = allWordsList;
+		allWordsList = WordController.userWordRegistry.getAllUserWordsList();
+		WordController.allWordsList = allWordsList;
 
 		maxId = 0;
 		if (allWordsList.size() > 0) {
 			allWordsList.forEach(word -> {
 				maxId = word.getId() > maxId ? word.getId() : maxId;
 				WordController.setMinRepTime(word);
-				// restoreCreationTime(word);
 			});
 		}
-		// restoreCreationTime2(allWordsListFinal);
 		newId.set(maxId);
 
 		return allWordsList;
 	}
 
-	public static void serializeAllWordsToFile(String path) {
-		try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(path))) {
-			objectOutputStream.writeObject(allWordsList);
-		} catch (Exception e) {
-			System.err.println("Error in serializeAllWordsToFile(String path : " + path + ") method of "
-					+ WordController.class.getName() + " class");
-			e.printStackTrace();
+	private static void serializeAllWordsToFile(String path) {
+		if (path.endsWith(".bin")) {
+			try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(path))) {
+				objectOutputStream.writeObject(allWordsList);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (path.endsWith(".json")) {
+			ObjectMapper mapper = new ObjectMapper();
+
+			// Java object to JSON file
+			try {
+				mapper.writeValue(new File(path), userWordRegistry);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+
 	}
 
 	public static void createNewWordGUI(String word, String translate) {
@@ -144,32 +184,6 @@ public class WordController {
 			return dateFormat.parse(dateFormat.format(date)).getTime();
 		} catch (Exception e) {
 			return time;
-		}
-	}
-
-	public static void restoreCreationTime(final Word word) {
-		if (word.getCreationTime() == 0) {
-			long sum = 0;
-			for (int i = 0; i < word.getBox(); i++) {
-				sum += getTimeDelta(i);
-			}
-
-			word.setCreationTime(word.getRegTime() - sum);
-		}
-	}
-
-	public static void restoreCreationTime2(List<Word> allWordsList) {
-		for (Word word : allWordsList) {
-			minTime = Long.MAX_VALUE;
-			allWordsList.stream().filter(w -> w.getId() >= word.getId()).forEach(w -> {
-				if (w.getCreationTime() < minTime) {
-					minTime = w.getCreationTime();
-				}
-			});
-
-			if (word.getCreationTime() != minTime) {
-				word.setCreationTime(minTime);
-			}
 		}
 	}
 

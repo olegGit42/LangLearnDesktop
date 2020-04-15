@@ -14,6 +14,6 @@ public class BeanConfig {
 	@Bean
 	@Qualifier(value = "allWords")
 	public List<Word> allWords() {
-		return WordController.unserializeAllWordsFromFile("words.bin");
+		return WordController.unserializeAllWordsMain();
 	}
 }

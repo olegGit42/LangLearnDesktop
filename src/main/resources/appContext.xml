@@ -8,14 +8,14 @@
 
 	<context:annotation-config />
 	<context:component-scan
-		base-package="com.app.colibri.controller" />
+		base-package="com.app.colibri" />
 
 	<bean id="word" class="com.app.colibri.model.Word"
 		scope="prototype" />
 
 	<bean id="mainFrame" class="com.app.colibri.view.MainFrame"
 		scope="prototype" init-method="init">
-		<constructor-arg name="title" value="Colibri v1.0.1.0" />
+		<constructor-arg name="title" value="Colibri v1.0.1.1" />
 	</bean>
 
 	<bean id="mainFrameListener"

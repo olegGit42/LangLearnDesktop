@@ -144,7 +144,7 @@ public class EditPanel extends JPanel {
 							editedWord.setNewBoxAndUpdDate(comboBox.getSelectedIndex());
 							GUIController.updMinRepeatTime();
 						}
-						WordController.serializeAllWordsToFile("words.bin");
+						WordController.serializeAllWordsMain();
 
 						JOptionPane.showMessageDialog(null, "Successfully EDITED", "Info", JOptionPane.INFORMATION_MESSAGE);
 
@@ -170,7 +170,7 @@ public class EditPanel extends JPanel {
 						WordController.allWordsList.remove(editedWord);
 						searchWords();
 						GUIController.updMinRepeatTime();
-						WordController.serializeAllWordsToFile("words.bin");
+						WordController.serializeAllWordsMain();
 						JOptionPane.showMessageDialog(null, "Successfully DELETED", "Info", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}

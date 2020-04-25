@@ -190,19 +190,19 @@ public class GUI {
 
 		JLabel wordRep = new JLabel("Word");
 		wordRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(2));
-		labelsRrepeateLeft.add(wordRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(3));
+		labelsRrepeateLeft.add(wordRep);
+		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(5));
 
 		JLabel translateRep = new JLabel("Translate");
 		translateRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		labelsRrepeateLeft.add(translateRep);
-		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(3));
+		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(2));
 
 		JLabel boxRep = new JLabel("Box");
 		boxRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		labelsRrepeateLeft.add(boxRep);
-		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(3));
+		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(4));
 
 		JLabel newBoxRep = new JLabel("New box");
 		newBoxRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
@@ -217,6 +217,7 @@ public class GUI {
 		wordRepText.setEditable(false);
 		wordRepText.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		labelsRrepeateCenter.add(wordRepText);
+		labelsRrepeateCenter.add(getVerticalPadForBoxLayout(1));
 
 		wordRepText.addMouseListener(new TextFieldClipboardMouseAdapter(wordRepText));
 
@@ -253,11 +254,11 @@ public class GUI {
 		bShowRep.setToolTipText("Show translation");
 		bShowRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("eye25.png")));
 		// bShowRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-		bShowRep.setPreferredSize(new Dimension(70, 25));
+		bShowRep.setPreferredSize(new Dimension(61, 20));
 		labelsRepeateRight.add(getVerticalPadForBoxLayout(20));
 		pShowRepeatButtons.add(bShowRep);
 		labelsRepeateRight.add(pShowRepeatButtons);
-		labelsRepeateRight.add(getVerticalPadForBoxLayout(2));
+		labelsRepeateRight.add(getVerticalPadForBoxLayout(6));
 		bShowRep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -322,10 +323,10 @@ public class GUI {
 		labelsRepeateRight.add(pSaveRepeatButtons);
 
 		JButton bSaveRep = new JButton();
-		bSaveRep.setToolTipText("Save");
+		bSaveRep.setToolTipText("Save new box");
 		bSaveRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("save21.png")));
 		// bSaveRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-		bSaveRep.setPreferredSize(new Dimension(70, 25));
+		bSaveRep.setPreferredSize(new Dimension(61, 25));
 		pSaveRepeatButtons.add(bSaveRep);
 		bSaveRep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -351,11 +352,16 @@ public class GUI {
 			}
 		});
 
+		JPanel pForgotButton = new JPanel();
+		pForgotButton.setLayout(new BoxLayout(pForgotButton, BoxLayout.Y_AXIS));
+		pForgotButton.add(getVerticalPadForBoxLayout(20));
+
 		JButton bSaveZeroRep = new JButton();
 		bSaveZeroRep.setToolTipText("Forgot");
-		bSaveZeroRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("forgot40.png")));
-		bSaveZeroRep.setPreferredSize(new Dimension(50, 50));
-		pSaveRepeatButtons.add(bSaveZeroRep);
+		bSaveZeroRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("forgot51.png")));
+		bSaveZeroRep.setPreferredSize(new Dimension(61, 61));
+		pForgotButton.add(bSaveZeroRep);
+		southRepeatePanel.add(pForgotButton);
 		bSaveZeroRep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!translateRepText.getText().trim().equals("")) {

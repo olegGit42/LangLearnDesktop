@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -213,12 +214,14 @@ public class GUI {
 		southRepeatePanel.add(labelsRrepeateCenter);
 
 		JTextField wordRepText = new JTextField(40);
+		wordRepText.setEditable(false);
 		wordRepText.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		labelsRrepeateCenter.add(wordRepText);
 
 		wordRepText.addMouseListener(new TextFieldClipboardMouseAdapter(wordRepText));
 
 		JTextField translateRepText = new JTextField(40);
+		translateRepText.setEditable(false);
 		translateRepText.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		labelsRrepeateCenter.add(translateRepText);
 
@@ -243,16 +246,24 @@ public class GUI {
 		labelsRepeateRight.setLayout(new BoxLayout(labelsRepeateRight, BoxLayout.Y_AXIS));
 		southRepeatePanel.add(labelsRepeateRight);
 
-		JButton bShowRep = new JButton("Show");
-		bShowRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-		labelsRepeateRight.add(getVerticalPadForBoxLayout(8));
-		labelsRepeateRight.add(bShowRep);
-		labelsRepeateRight.add(getVerticalPadForBoxLayout(21));
+		JPanel pShowRepeatButtons = new JPanel();
+		pShowRepeatButtons.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+
+		JButton bShowRep = new JButton();
+		bShowRep.setToolTipText("Show translation");
+		bShowRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("eye25.png")));
+		// bShowRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+		bShowRep.setPreferredSize(new Dimension(70, 25));
+		labelsRepeateRight.add(getVerticalPadForBoxLayout(20));
+		pShowRepeatButtons.add(bShowRep);
+		labelsRepeateRight.add(pShowRepeatButtons);
+		labelsRepeateRight.add(getVerticalPadForBoxLayout(2));
 		bShowRep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				if (!translateRepText.getText().equals("")) {
 					translateRepText.setText(null);
+					translateRepText.setToolTipText(null);
 					boxValueRep.setText(" ");
 					newBoxText.setSelectedIndex(-1);
 					return;
@@ -273,6 +284,7 @@ public class GUI {
 								translate = translate + "| [copy]: " + WordController.allWordsList.get(i).getTranslate();
 							}
 							translateRepText.setText(translate);
+							translateRepText.setToolTipText(translate);
 							boxValueRep.setText(" " + getBoxInfo(WordController.allWordsList.get(i)));
 							if (WordController.allWordsList.get(i).getBox() + 1 < newBoxText.getItemCount()) {
 								newBoxText.setSelectedIndex(WordController.allWordsList.get(i).getBox() + 1);
@@ -305,12 +317,20 @@ public class GUI {
 
 		refreshRepeate.doClick();
 
-		JButton bSaveRep = new JButton("Save");
-		bSaveRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-		labelsRepeateRight.add(bSaveRep);
+		JPanel pSaveRepeatButtons = new JPanel();
+		pSaveRepeatButtons.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+		labelsRepeateRight.add(pSaveRepeatButtons);
+
+		JButton bSaveRep = new JButton();
+		bSaveRep.setToolTipText("Save");
+		bSaveRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("save21.png")));
+		// bSaveRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+		bSaveRep.setPreferredSize(new Dimension(70, 25));
+		pSaveRepeatButtons.add(bSaveRep);
 		bSaveRep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (0 <= newBoxText.getSelectedIndex() && newBoxText.getSelectedIndex() <= 7) {
+				if (0 <= newBoxText.getSelectedIndex() && newBoxText.getSelectedIndex() <= 7
+						&& !translateRepText.getText().trim().equals("")) {
 					for (Word word : WordController.allWordsList) {
 						if (wordRepText.getText().trim().toLowerCase().equals(word.getWord().toLowerCase())) {
 							word.setNewBoxAndUpdDate(newBoxText.getSelectedIndex());
@@ -320,12 +340,27 @@ public class GUI {
 
 					wordRepText.setText(null);
 					translateRepText.setText(null);
+					translateRepText.setToolTipText(null);
 					boxValueRep.setText(" ");
 					newBoxText.setSelectedIndex(-1);
 
 					refreshRepeate.doClick();
 					WordController.serializeAllWordsMain();
 					GUIController.updMinRepeatTime();
+				}
+			}
+		});
+
+		JButton bSaveZeroRep = new JButton();
+		bSaveZeroRep.setToolTipText("Forgot");
+		bSaveZeroRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("forgot40.png")));
+		bSaveZeroRep.setPreferredSize(new Dimension(50, 50));
+		pSaveRepeatButtons.add(bSaveZeroRep);
+		bSaveZeroRep.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!translateRepText.getText().trim().equals("")) {
+					newBoxText.setSelectedIndex(0);
+					bSaveRep.doClick();
 				}
 			}
 		});

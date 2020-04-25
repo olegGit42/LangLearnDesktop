@@ -69,18 +69,18 @@ public class WordController {
 	}
 
 	public static List<Word> unserializeAllWordsMain() {
-		// return unserializeAllWordsFromFile("words.json"); // main
-		return unserializeAllWordsFromFile("words.bin"); // for compatibility
+		return unserializeAllWordsFromFile("words.json"); // main
+		// return unserializeAllWordsFromFile("words.bin"); // for compatibility
 	}
 
 	public static void serializeAllWordsMain() {
 		serializeAllWordsToFile("words.json"); // main
-		serializeAllWordsToFile("words.bin"); // for compatibility
+		// serializeAllWordsToFile("words.bin"); // for compatibility
 	}
 
 	public static void serializeAllWordsCopy() {
 		serializeAllWordsToFile("wordsCopy.json"); // main
-		serializeAllWordsToFile("wordsCopy.bin"); // for compatibility
+		// serializeAllWordsToFile("wordsCopy.bin"); // for compatibility
 	}
 
 	@SuppressWarnings("unchecked")

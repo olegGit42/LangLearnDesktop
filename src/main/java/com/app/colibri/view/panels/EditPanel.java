@@ -548,8 +548,10 @@ public class EditPanel extends JPanel {
 
 		tfWord.setText(wordStr);
 		tfTranslate.setText(translateStr);
+		tfTranslate.setToolTipText(translateStr);
 		tfEditWord.setText(wordStr);
 		tfEditTranslate.setText(translateStr);
+		tfEditTranslate.setToolTipText(translateStr);
 		tfCreationDate.setText(creationDateStr);
 		tfRepeateDate.setText(repeateDateStr);
 		tfBox.setText(boxStr);

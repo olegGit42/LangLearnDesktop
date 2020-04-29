@@ -53,4 +53,8 @@ public class Word implements Serializable {
 		Box.boxList.get(box).add(this);
 	}
 
+	public long obtainRepetitionTime() {
+		return this.getRegTime() + WordController.getTimeDelta(this.getBox());
+	}
+
 }

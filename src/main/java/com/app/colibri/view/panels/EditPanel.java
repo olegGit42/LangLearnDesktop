@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -78,6 +79,7 @@ public class EditPanel extends JPanel {
 	private JLabel lblCountAll;
 	@SuppressWarnings("rawtypes")
 	private JComboBox comboBox;
+	private JCheckBox cbRepTimeOrder;
 
 	/**
 	 * Create the panel.
@@ -146,7 +148,8 @@ public class EditPanel extends JPanel {
 						}
 						WordController.serializeAllWordsMain();
 
-						JOptionPane.showMessageDialog(null, "Successfully EDITED", "Info", JOptionPane.INFORMATION_MESSAGE);
+						// JOptionPane.showMessageDialog(null, "Successfully EDITED", "Info",
+						// JOptionPane.INFORMATION_MESSAGE);
 
 						int selectedRowIndex = table.getSelectedRows()[0];
 						table.getSelectionModel().clearSelection();
@@ -171,7 +174,8 @@ public class EditPanel extends JPanel {
 						searchWords();
 						GUIController.updMinRepeatTime();
 						WordController.serializeAllWordsMain();
-						JOptionPane.showMessageDialog(null, "Successfully DELETED", "Info", JOptionPane.INFORMATION_MESSAGE);
+						// JOptionPane.showMessageDialog(null, "Successfully DELETED", "Info",
+						// JOptionPane.INFORMATION_MESSAGE);
 					}
 				}
 			}
@@ -447,12 +451,43 @@ public class EditPanel extends JPanel {
 		panelCenter.add(btnBoxMinus);
 		btnBoxMinus.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("minus21.png")));
 
+		JButton btnHideTranslateColumn = new JButton("Hide \"Translate\" column");
+		btnHideTranslateColumn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (table.getColumnModel().getColumn(1).getWidth() == 0) {
+					for (int i = 0; i < 2; i++) {
+						table.getColumnModel().getColumn(1).setMinWidth(150);
+						table.getColumnModel().getColumn(1).setMaxWidth(150);
+						table.getColumnModel().getColumn(1).setWidth(150);
+					}
+
+					table.getColumnModel().getColumn(1).setMinWidth(10);
+					table.getColumnModel().getColumn(1).setMaxWidth(1000);
+					table.getColumnModel().getColumn(1).setPreferredWidth(150);
+
+					btnHideTranslateColumn.setText("Hide \"" + table.getColumnName(1) + "\" column");
+				} else {
+					table.getColumnModel().getColumn(1).setWidth(0);
+					table.getColumnModel().getColumn(1).setMinWidth(0);
+					table.getColumnModel().getColumn(1).setMaxWidth(0);
+
+					btnHideTranslateColumn.setText("Show \"" + table.getColumnName(1) + "\" column");
+				}
+			}
+		});
+		btnHideTranslateColumn.setBounds(24, 400, 191, 26);
+		panelCenter.add(btnHideTranslateColumn);
+
+		cbRepTimeOrder = new JCheckBox("order by repetition time");
+		cbRepTimeOrder.setBounds(24, 368, 191, 24);
+		panelCenter.add(cbRepTimeOrder);
+
 		JPanel panelWest = new JPanel();
 		panelWest.setName("");
 		add(panelWest, BorderLayout.WEST);
 		panelWest.setLayout(new BorderLayout(0, 0));
 
-		GUIController.searchWords(searchList, null, false);
+		GUIController.searchWords(searchList, null, false, false);
 
 		TableModel modelAllWords = new SearchTableModel(searchList);
 		table = new JTable();
@@ -576,7 +611,7 @@ public class EditPanel extends JPanel {
 	}
 
 	private void searchWords() {
-		GUIController.searchWords(searchList, tfFindWord.getText(), tbWordTranslate.isSelected());
+		GUIController.searchWords(searchList, tfFindWord.getText(), tbWordTranslate.isSelected(), cbRepTimeOrder.isSelected());
 		table.getSelectionModel().clearSelection();
 		table.repaint();
 		table.revalidate();

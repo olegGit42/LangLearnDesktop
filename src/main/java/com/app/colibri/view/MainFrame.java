@@ -1,6 +1,7 @@
 package com.app.colibri.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.WindowListener;
 
@@ -31,6 +32,8 @@ public class MainFrame extends JFrame {
 
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.pack();
+		this.setSize(new Dimension(850, 730));
+		this.setLocationRelativeTo(null);
 		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		this.addWindowListener(windowListener);
 		this.setVisible(true);

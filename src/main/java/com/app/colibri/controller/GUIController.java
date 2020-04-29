@@ -36,12 +36,13 @@ public class GUIController {
 				.sorted(Comparator.comparingInt(Word::getRepeateIndicator).reversed()).forEach(badRememberWordList::add);
 	}
 
-	public static void searchWords(final List<Word> serachWordList, final String str, final boolean isTranslate) {
+	public static void searchWords(final List<Word> serachWordList, final String str, final boolean isTranslate,
+			final boolean isRepetitionTimeOrder) {
 		serachWordList.clear();
 		EditPanel.clearWordsCount();
 		Filter.init(str);
-		allWordsList.stream().filter(Filter::isAppropriate).sorted((w1, w2) -> compareWords(w1, w2, isTranslate))
-				.forEach(word -> {
+		allWordsList.stream().filter(Filter::isAppropriate)
+				.sorted((w1, w2) -> compareWords(w1, w2, isTranslate, isRepetitionTimeOrder)).forEach(word -> {
 					EditPanel.incrementWordsCount(word);
 					serachWordList.add(word);
 				});
@@ -136,13 +137,25 @@ public class GUIController {
 
 	}
 
-	private static int compareWords(Word w1, Word w2, boolean isTranslate) {
-		if (isTranslate) {
+	private static int compareWords(Word w1, Word w2, boolean isTranslate, boolean isRepetitionTimeOrder) {
+
+		if (isRepetitionTimeOrder) {
+
+			if (w1.obtainRepetitionTime() < w2.obtainRepetitionTime()) {
+				return -1;
+			} else if (w1.obtainRepetitionTime() == w2.obtainRepetitionTime()) {
+				return 0;
+			} else {
+				return 1;
+			}
+
+		} else if (isTranslate) {
 			return fixUpperYoForCompare(w1.getTranslate().toUpperCase())
 					.compareTo(fixUpperYoForCompare(w2.getTranslate().toUpperCase()));
 		} else {
 			return w1.getWord().toUpperCase().compareTo(w2.getWord().toUpperCase());
 		}
+
 	}
 
 	private static String fixUpperYoForCompare(String str) {

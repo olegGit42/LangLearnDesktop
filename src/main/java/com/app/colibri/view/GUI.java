@@ -56,6 +56,10 @@ public class GUI {
 
 	public static final List<Word> repeatedWordList = new ArrayList<Word>();
 
+	private JButton bAdd;
+	private JTextField newWord;
+	private JTextField translate;
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public GUI() {
 
@@ -79,24 +83,28 @@ public class GUI {
 		JPanel iWl = new JPanel(new BorderLayout());
 		inputWordPanel.add(iWl);
 
-		JTextField newWord = new JTextField(20);
+		newWord = new JTextField(40);
 		iWl.add(newWord, BorderLayout.NORTH);
-
 		newWord.addMouseListener(new TextFieldClipboardMouseAdapter(newWord));
+		newWord.addCaretListener(listener -> bAddButtonStateChange());
 
-		JTextField translate = new JTextField(20);
+		translate = new JTextField(40);
 		iWl.add(translate, BorderLayout.SOUTH);
-
 		translate.addMouseListener(new TextFieldClipboardMouseAdapter(translate));
+		translate.addCaretListener(listener -> {
+			translate.setToolTipText(translate.getText().equals("") ? null : translate.getText());
+			bAddButtonStateChange();
+		});
 
 		JPanel iWr = new JPanel();
 		inputWordPanel.add(iWr);
 
-		JButton add = new JButton("Add");
-		add.setPreferredSize(new Dimension(60, 40));
-
-		iWr.add(add);
-		add.addActionListener(e -> {
+		bAdd = new JButton();
+		bAdd.setPreferredSize(new Dimension(60, 40));
+		bAdd.setToolTipText("Show repetition time");
+		bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("time32.png")));
+		iWr.add(bAdd);
+		bAdd.addActionListener(e -> {
 			String newWordStr = newWord.getText().trim();
 			String translateStr = translate.getText().trim();
 
@@ -110,10 +118,14 @@ public class GUI {
 				}
 
 				if (check == 0) {
-					WordController.createNewWordGUI(newWordStr, translateStr);
-					WordController.serializeAllWordsMain();
-
-					JOptionPane.showMessageDialog(null, "Successfully ADDED", "Info", JOptionPane.INFORMATION_MESSAGE);
+					try {
+						WordController.createNewWordGUI(newWordStr, translateStr);
+						WordController.serializeAllWordsMain();
+						// JOptionPane.showMessageDialog(null, "Successfully ADDED", "Info",
+						// JOptionPane.INFORMATION_MESSAGE);
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(null, "ADDING error!", "Error", JOptionPane.ERROR_MESSAGE);
+					}
 
 					translate.setText("");
 					newWord.setText("");
@@ -126,8 +138,15 @@ public class GUI {
 			} else {
 				newWord.setText(newWord.getText().trim());
 				translate.setText(translate.getText().trim());
-				String recurenceTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date(WordController.minRepeatTime));
-				JOptionPane.showMessageDialog(null, recurenceTime, "Recurrence time", JOptionPane.INFORMATION_MESSAGE);
+
+				String recurenceTime;
+				if (WordController.minRepeatTime == Long.MAX_VALUE) {
+					recurenceTime = "You have no words to repeat";
+				} else {
+					recurenceTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date(WordController.minRepeatTime));
+				}
+
+				JOptionPane.showMessageDialog(null, recurenceTime, "Repetition time", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 
@@ -172,7 +191,7 @@ public class GUI {
 		Timer timer = new Timer(3 * 1000, (e -> {
 			if (repeatedWordList.isEmpty()) {
 				if (System.currentTimeMillis() >= WordController.minRepeatTime) {
-					add.setBackground(Color.GREEN);
+					bAdd.setBackground(Color.GREEN);
 					inputWordPanel.setBackground(Color.GREEN);
 					// TODO why doesn't produce sound -> Toolkit.getDefaultToolkit().beep();
 					NotificationSound.beep();
@@ -302,7 +321,7 @@ public class GUI {
 
 		refreshRepeate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				add.setBackground(null);
+				bAdd.setBackground(null);
 				inputWordPanel.setBackground(null);
 				GUIController.repeateWords(repeatedWordList);
 				tableRepeate.repaint();
@@ -497,4 +516,15 @@ public class GUI {
 	public Component getVerticalPadForBoxLayout(final int pad) {
 		return javax.swing.Box.createRigidArea(new Dimension(0, pad));
 	}
+
+	private void bAddButtonStateChange() {
+		if (newWord.getText().trim().equals("") || translate.getText().trim().equals("")) {
+			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("time32.png")));
+			bAdd.setToolTipText("Show repetition time");
+		} else {
+			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("add32.png")));
+			bAdd.setToolTipText("Add new word");
+		}
+	}
+
 }

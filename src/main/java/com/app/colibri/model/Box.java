@@ -1,6 +1,7 @@
 package com.app.colibri.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.app.colibri.controller.WordController;
@@ -16,7 +17,8 @@ public class Box {
 	}
 
 	public static void fillBoxes() {
-		WordController.allWordsList.stream().filter(word -> word != null).forEach(Word::addToBox);
+		WordController.allWordsList.stream().filter(word -> word != null)
+				.sorted(Comparator.comparingLong(Word::obtainRepetitionTime)).forEach(Word::addToBox);
 	}
 
 	public static void refreshBox() {

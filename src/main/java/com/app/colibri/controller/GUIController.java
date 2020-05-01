@@ -37,11 +37,11 @@ public class GUIController {
 	}
 
 	public static void searchWords(final List<Word> serachWordList, final String str, final boolean isTranslate,
-			final boolean isRepetitionTimeOrder) {
+			final boolean isRepetitionTimeOrder, final String tag) {
 		serachWordList.clear();
 		EditPanel.clearWordsCount();
 		Filter.init(str);
-		allWordsList.stream().filter(Filter::isAppropriate)
+		allWordsList.stream().filter(word -> Filter.isAppropriate(word, tag))
 				.sorted((w1, w2) -> compareWords(w1, w2, isTranslate, isRepetitionTimeOrder)).forEach(word -> {
 					EditPanel.incrementWordsCount(word);
 					serachWordList.add(word);
@@ -76,9 +76,13 @@ public class GUIController {
 			}
 		}
 
-		public static boolean isAppropriate(final Word word) {
-			return nullCondition() || wordCondition(word) || translateCondition(word) || idCondition(word) || boxCondition(word)
-					|| creationDateCondition(word) || repeatDateCondition(word);
+		public static boolean isAppropriate(final Word word, final String tag) {
+			return (nullCondition() || wordCondition(word) || translateCondition(word) || idCondition(word) || boxCondition(word)
+					|| creationDateCondition(word) || repeatDateCondition(word)) && tagCondition(word, tag);
+		}
+
+		private static boolean tagCondition(final Word word, final String tag) {
+			return tag.equals("All tags") || word.isContainTag(tag);
 		}
 
 		private static boolean nullCondition() {
@@ -162,7 +166,7 @@ public class GUIController {
 		return str.startsWith("Ё") ? "ЕЯЯ" + str : str;
 	}
 
-	private static String getFromClipboard() {
+	public static String getFromClipboard() {
 		String result = "";
 
 		Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

@@ -7,17 +7,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.app.colibri.model.Word;
+import com.app.colibri.registry.TagRegistry;
 import com.app.colibri.registry.UserWordRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WordController {
-	public static int maxId;
+	private static int maxId;
 
 	public static List<Word> allWordsList;
 	public static final AtomicInteger newId = new AtomicInteger();
@@ -68,9 +68,9 @@ public class WordController {
 		}
 	}
 
-	public static List<Word> unserializeAllWordsMain() {
-		return unserializeAllWordsFromFile("words.json"); // main
-		// return unserializeAllWordsFromFile("words.bin"); // for compatibility
+	public static void unserializeAllWordsMain() {
+		unserializeAllWordsFromFile("words.json"); // main
+		// unserializeAllWordsFromFile("words.bin"); // for compatibility
 	}
 
 	public static void serializeAllWordsMain() {
@@ -84,41 +84,40 @@ public class WordController {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static List<Word> unserializeAllWordsFromFile(String path) {
-		List<Word> allWordsList = new ArrayList<>();
-		WordController.userWordRegistry = new UserWordRegistry();
-		WordController.userWordRegistry.setAllUserWordsList(allWordsList);
+	private static void unserializeAllWordsFromFile(String path) {
+		userWordRegistry = AppRun.appContext.getBean("userWordRegistry", UserWordRegistry.class);
 
 		if (path.endsWith(".bin")) {
 			try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path))) {
-				WordController.userWordRegistry.setAllUserWordsList((List<Word>) objectInputStream.readObject());
+				userWordRegistry.setAllUserWordsList((List<Word>) objectInputStream.readObject());
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.err.println("File " + path + " not found");
 			}
 		} else if (path.endsWith(".json")) {
 			ObjectMapper mapper = new ObjectMapper();
 
 			// JSON file to Java object
 			try {
-				WordController.userWordRegistry = mapper.readValue(new File(path), UserWordRegistry.class);
+				userWordRegistry = mapper.readValue(new File(path), UserWordRegistry.class);
+				if (userWordRegistry.getTagRegistry() == null) { // for compatibility
+					userWordRegistry.setTagRegistry(AppRun.appContext.getBean("tagRegistry", TagRegistry.class));
+				}
+				userWordRegistry.getTagRegistry().restoreTagIdMap();
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.err.println("File " + path + " not found");
 			}
 		}
 
-		allWordsList = WordController.userWordRegistry.getAllUserWordsList();
-		WordController.allWordsList = allWordsList;
+		allWordsList = userWordRegistry.getAllUserWordsList();
 
 		maxId = 0;
-		if (allWordsList.size() > 0) {
-			allWordsList.forEach(word -> {
-				maxId = word.getId() > maxId ? word.getId() : maxId;
-				WordController.setMinRepTime(word);
-			});
-		}
-		newId.set(maxId);
 
-		return allWordsList;
+		allWordsList.forEach(word -> {
+			maxId = word.getId() > maxId ? word.getId() : maxId;
+			setMinRepTime(word);
+		});
+
+		newId.set(maxId);
 	}
 
 	private static void serializeAllWordsToFile(String path) {

@@ -238,8 +238,6 @@ public class GUI {
 		labelsRrepeateCenter.add(wordRepText);
 		labelsRrepeateCenter.add(getVerticalPadForBoxLayout(1));
 
-		wordRepText.addMouseListener(new TextFieldClipboardMouseAdapter(wordRepText));
-
 		JTextField translateRepText = new JTextField(40);
 		translateRepText.setEditable(false);
 		translateRepText.setAlignmentX(JComponent.LEFT_ALIGNMENT);

@@ -14,7 +14,7 @@ public class AppRun {
 
 	static {
 		appContext = new ClassPathXmlApplicationContext("appContext.xml");
-		appContext.getBean("allWords");
+		WordController.unserializeAllWordsMain();
 	}
 
 	public static void main(String[] args) {

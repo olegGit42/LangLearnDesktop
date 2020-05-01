@@ -15,7 +15,7 @@
 
 	<bean id="mainFrame" class="com.app.colibri.view.MainFrame"
 		scope="prototype" init-method="init">
-		<constructor-arg name="title" value="Colibri v1.0.1.4" />
+		<constructor-arg name="title" value="Colibri v1.0.1.5" />
 	</bean>
 
 	<bean id="mainFrameListener"

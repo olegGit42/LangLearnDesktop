@@ -18,9 +18,9 @@ public class TextFieldClipboardMouseAdapter extends MouseAdapter {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (e.getButton() == MouseEvent.BUTTON2) {
+		if (e.getButton() == MouseEvent.BUTTON3) {
 			GUIController.addTextFromClipboard(textField);
-		} else if (e.getButton() == MouseEvent.BUTTON3) {
+		} else if (e.getButton() == MouseEvent.BUTTON2) {
 			textField.setText("");
 		}
 	}

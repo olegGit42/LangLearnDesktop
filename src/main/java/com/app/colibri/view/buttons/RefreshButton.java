@@ -1,5 +1,7 @@
 package com.app.colibri.view.buttons;
 
+import static com.app.colibri.service.MainLocaleManager.addTrackedItem;
+
 import java.util.List;
 
 import javax.swing.JButton;
@@ -17,6 +19,7 @@ public class RefreshButton extends JButton {
 
 	public RefreshButton(JTable p_table) {
 		super("Refresh");
+		addTrackedItem(this, "Refresh");
 		table = p_table;
 
 		this.addActionListener(e -> {
@@ -28,6 +31,7 @@ public class RefreshButton extends JButton {
 
 	public RefreshButton(FuncVoid p_funcVoid) {
 		super("Refresh");
+		addTrackedItem(this, "Refresh");
 		funcVoid = p_funcVoid;
 
 		this.addActionListener(e -> funcVoid.doIt());
@@ -35,6 +39,7 @@ public class RefreshButton extends JButton {
 
 	public RefreshButton(FuncVoid p_funcVoid, List<JTable> p_tableList) {
 		super("Refresh");
+		addTrackedItem(this, "Refresh");
 		funcVoid = p_funcVoid;
 		tableList = p_tableList;
 

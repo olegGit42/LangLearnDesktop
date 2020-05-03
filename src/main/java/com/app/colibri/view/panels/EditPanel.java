@@ -1,6 +1,8 @@
 package com.app.colibri.view.panels;
 
 import static com.app.colibri.controller.WordController.getBoxInfo;
+import static com.app.colibri.service.AppSettings.getLocaledItem;
+import static com.app.colibri.service.MainLocaleManager.addTrackedItem;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -111,12 +113,14 @@ public class EditPanel extends JPanel {
 		panelCenter.setLayout(null);
 
 		JLabel lblWord = new JLabel("Word");
+		addTrackedItem(lblWord, "Word");
 		lblWord.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblWord.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblWord.setBounds(24, 35, 50, 14);
 		panelCenter.add(lblWord);
 
 		JLabel lblTranslate = new JLabel("Translate");
+		addTrackedItem(lblTranslate, "Translate");
 		lblTranslate.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTranslate.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblTranslate.setBounds(24, 60, 50, 14);
@@ -135,6 +139,8 @@ public class EditPanel extends JPanel {
 		panelCenter.add(tfTranslate);
 
 		JButton btnEdit = new JButton("Edit");
+		addTrackedItem(btnEdit, "Edit");
+		btnEdit.setMargin(new Insets(2, 2, 2, 2));
 		btnEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				editState = EditState.EDIT;
@@ -143,19 +149,21 @@ public class EditPanel extends JPanel {
 							&& tfEditTranslate.getText().trim().equals(tfTranslate.getText())
 							&& tfBox.getText().equals(String.valueOf(comboBox.getSelectedItem()))
 							&& actualTagSet.equals(editedTagSet)) {
-						JOptionPane.showMessageDialog(null, "No changes", "Info", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(null, getLocaledItem("No changes"), getLocaledItem("Info"),
+								JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 
 					for (Word word : WordController.allWordsList) {
 						if (tfEditWord.getText().trim().toLowerCase().equals(word.getWord().toLowerCase())
 								&& word != editedWord) {
-							JOptionPane.showMessageDialog(null, "This word already exists", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(null, getLocaledItem("already_added"), getLocaledItem("Error"),
+									JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 					}
 
-					final int answer = JOptionPane.showConfirmDialog(null, "Do you really want to EDIT the word?", "Question",
+					final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_edit"), getLocaledItem("Question"),
 							JOptionPane.YES_NO_OPTION);
 
 					if (answer == JOptionPane.YES_OPTION) {
@@ -170,9 +178,6 @@ public class EditPanel extends JPanel {
 						}
 						WordController.serializeAllWordsMain();
 
-						// JOptionPane.showMessageDialog(null, "Successfully EDITED", "Info",
-						// JOptionPane.INFORMATION_MESSAGE);
-
 						int selectedRowIndex = table.getSelectedRows()[0];
 						table.getSelectionModel().clearSelection();
 						table.changeSelection(selectedRowIndex, 0, false, false);
@@ -184,11 +189,13 @@ public class EditPanel extends JPanel {
 		panelCenter.add(btnEdit);
 
 		JButton btnDelete = new JButton("Delete");
+		addTrackedItem(btnDelete, "Delete");
+		btnDelete.setMargin(new Insets(2, 2, 2, 2));
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				editState = EditState.DELETE;
 				if (isDefinedWord()) {
-					final int answer = JOptionPane.showConfirmDialog(null, "Do you really want to DELETE the word?", "Question",
+					final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_del"), getLocaledItem("Question"),
 							JOptionPane.YES_NO_OPTION);
 
 					if (answer == JOptionPane.YES_OPTION) {
@@ -196,8 +203,6 @@ public class EditPanel extends JPanel {
 						searchWords();
 						GUIController.updMinRepeatTime();
 						WordController.serializeAllWordsMain();
-						// JOptionPane.showMessageDialog(null, "Successfully DELETED", "Info",
-						// JOptionPane.INFORMATION_MESSAGE);
 					}
 				}
 			}
@@ -214,12 +219,14 @@ public class EditPanel extends JPanel {
 		tfEditWord.addMouseListener(new TextFieldClipboardMouseAdapter(tfEditWord));
 
 		JLabel lblEditWord = new JLabel("Word");
+		addTrackedItem(lblEditWord, "Word");
 		lblEditWord.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEditWord.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblEditWord.setBounds(24, 219, 50, 14);
 		panelCenter.add(lblEditWord);
 
 		JLabel lblEditTranslate = new JLabel("Translate");
+		addTrackedItem(lblEditTranslate, "Translate");
 		lblEditTranslate.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEditTranslate.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblEditTranslate.setBounds(24, 244, 50, 14);
@@ -233,21 +240,24 @@ public class EditPanel extends JPanel {
 		tfEditTranslate.addMouseListener(new TextFieldClipboardMouseAdapter(tfEditTranslate));
 
 		JLabel lblActual = new JLabel("Actual");
+		addTrackedItem(lblActual, "Actual");
 		lblActual.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblActual.setHorizontalAlignment(SwingConstants.CENTER);
-		lblActual.setBounds(238, 9, 46, 14);
+		lblActual.setBounds(211, 9, 100, 14);
 		panelCenter.add(lblActual);
 
 		JLabel lblEdit = new JLabel("Edited");
+		addTrackedItem(lblEdit, "Edited");
 		lblEdit.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblEdit.setHorizontalAlignment(SwingConstants.CENTER);
-		lblEdit.setBounds(238, 194, 46, 14);
+		lblEdit.setBounds(211, 194, 100, 14);
 		panelCenter.add(lblEdit);
 
 		JLabel lblCreationDate = new JLabel("Creation date");
+		addTrackedItem(lblCreationDate, "Creation date");
 		lblCreationDate.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCreationDate.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblCreationDate.setBounds(84, 90, 77, 14);
+		lblCreationDate.setBounds(24, 90, 137, 14);
 		panelCenter.add(lblCreationDate);
 
 		tfCreationDate = new JTextField();
@@ -257,6 +267,7 @@ public class EditPanel extends JPanel {
 		panelCenter.add(tfCreationDate);
 
 		JLabel lblRepeateDate = new JLabel("Repeat date");
+		addTrackedItem(lblRepeateDate, "Repeat date");
 		lblRepeateDate.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblRepeateDate.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblRepeateDate.setBounds(84, 114, 77, 14);
@@ -269,6 +280,7 @@ public class EditPanel extends JPanel {
 		panelCenter.add(tfRepeateDate);
 
 		JLabel lblBox = new JLabel("Box");
+		addTrackedItem(lblBox, "Box");
 		lblBox.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblBox.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblBox.setBounds(315, 114, 77, 14);
@@ -281,6 +293,7 @@ public class EditPanel extends JPanel {
 		panelCenter.add(tfBox);
 
 		JLabel lblRepeateCount = new JLabel("Repeat count");
+		addTrackedItem(lblRepeateCount, "Repeat count");
 		lblRepeateCount.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblRepeateCount.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblRepeateCount.setBounds(297, 90, 95, 14);
@@ -311,12 +324,14 @@ public class EditPanel extends JPanel {
 		pnlWordsSummary.setLayout(null);
 
 		JLabel lblBoxCount = new JLabel("Box");
+		addTrackedItem(lblBoxCount, "Box");
 		lblBoxCount.setBounds(0, 12, 50, 14);
 		pnlWordsSummary.add(lblBoxCount);
 		lblBoxCount.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblBoxCount.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lblCount = new JLabel("Count");
+		addTrackedItem(lblCount, "Count");
 		lblCount.setBounds(0, 31, 50, 14);
 		pnlWordsSummary.add(lblCount);
 		lblCount.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -383,6 +398,7 @@ public class EditPanel extends JPanel {
 		lblCountB4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lblArchive = new JLabel("Archive");
+		addTrackedItem(lblArchive, "period_box_7");
 		lblArchive.setBounds(353, 12, 40, 14);
 		pnlWordsSummary.add(lblArchive);
 		lblArchive.setHorizontalAlignment(SwingConstants.CENTER);
@@ -419,6 +435,7 @@ public class EditPanel extends JPanel {
 		lblCountB7.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lblAll = new JLabel("All");
+		addTrackedItem(lblAll, "All");
 		lblAll.setBounds(400, 12, 40, 14);
 		pnlWordsSummary.add(lblAll);
 		lblAll.setHorizontalAlignment(SwingConstants.CENTER);
@@ -431,6 +448,7 @@ public class EditPanel extends JPanel {
 		lblCountAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lblEditBox = new JLabel("Box");
+		addTrackedItem(lblEditBox, "Box");
 		lblEditBox.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEditBox.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblEditBox.setBounds(24, 270, 50, 14);
@@ -478,6 +496,7 @@ public class EditPanel extends JPanel {
 		panelCenter.add(comboBoxTag);
 
 		JLabel lblTags = new JLabel("Tags");
+		addTrackedItem(lblTags, "Tags");
 		lblTags.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTags.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblTags.setBounds(84, 140, 77, 14);
@@ -506,6 +525,7 @@ public class EditPanel extends JPanel {
 		panelCenter.add(comboBoxEditTag);
 
 		JLabel lblEditTag = new JLabel("Tags");
+		addTrackedItem(lblEditTag, "Tags");
 		lblEditTag.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblEditTag.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblEditTag.setBounds(245, 270, 50, 14);
@@ -534,8 +554,9 @@ public class EditPanel extends JPanel {
 				if (!(editedTagSet.contains(v_newTag) || v_newTag.equals(""))) {
 					editedTagSet.add(v_newTag);
 					comboBoxEditTag.addItem(v_newTag);
-					comboBoxEditTag.setSelectedItem(v_newTag);
 				}
+				comboBoxEditTag.setSelectedItem(v_newTag);
+				comboBoxEditTag.showPopup();
 			}
 		});
 		bAddTag.setMargin(new Insets(2, 12, 2, 14));
@@ -556,8 +577,8 @@ public class EditPanel extends JPanel {
 					comboBoxEditTag.removeItem(v_tag);
 
 				} else if (e.getButton() == MouseEvent.BUTTON3) {
-					final int answer = JOptionPane.showConfirmDialog(null, "Do you really want to REMOVE all tags from the word?",
-							"Question", JOptionPane.YES_NO_OPTION);
+					final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_rem_wrd_tags"),
+							getLocaledItem("Question"), JOptionPane.YES_NO_OPTION);
 
 					if (answer == JOptionPane.YES_OPTION) {
 						editedTagSet.clear();
@@ -573,6 +594,7 @@ public class EditPanel extends JPanel {
 		bRemoveTag.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("minus21.png")));
 
 		JLabel lblTag = new JLabel("Tag");
+		addTrackedItem(lblTag, "Tag");
 		lblTag.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblTag.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblTag.setBounds(24, 418, 50, 14);
@@ -597,9 +619,10 @@ public class EditPanel extends JPanel {
 		panelCenter.add(tfTag);
 
 		JLabel lblNewTag = new JLabel("will replaced by");
+		addTrackedItem(lblNewTag, "will_replaced");
 		lblNewTag.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewTag.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblNewTag.setBounds(182, 418, 90, 14);
+		lblNewTag.setBounds(182, 418, 105, 14);
 		panelCenter.add(lblNewTag);
 
 		tfNewTag = new JTextField();
@@ -614,36 +637,40 @@ public class EditPanel extends JPanel {
 			}
 		});
 		tfNewTag.setColumns(10);
-		tfNewTag.setBounds(275, 416, 95, 20);
+		tfNewTag.setBounds(290, 416, 95, 20);
 		panelCenter.add(tfNewTag);
 
 		JButton btnReplaceTag = new JButton("Replace");
+		addTrackedItem(btnReplaceTag, "Replace");
 		btnReplaceTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				String v_oldTag = tfTag.getText() == null || tfTag.getText().equals("All tags") ? "" : tfTag.getText();
+				String v_oldTag = tfTag.getText() == null || tfTag.getText().equals(getLocaledItem("All tags")) ? ""
+						: tfTag.getText();
 				String v_newTag = tfNewTag.getText() == null ? "" : tfNewTag.getText().toUpperCase().trim();
 
-				if (!WordController.userWordRegistry.getTagRegistry().getTagIdMap().containsKey(v_oldTag)) {
+				if (!WordController.userDataRegistry.getTagRegistry().getTagIdMap().containsKey(v_oldTag)) {
 					JOptionPane.showMessageDialog(null,
-							v_oldTag.equals("") ? "Choose tag, which you want to replace" : "Tag \"" + v_oldTag + "\" not found",
-							"Warning", JOptionPane.WARNING_MESSAGE);
+							v_oldTag.equals("") ? getLocaledItem("choose_tag")
+									: getLocaledItem("Tag") + " \"" + v_oldTag + "\" " + getLocaledItem("not found"),
+							getLocaledItem("Warning"), JOptionPane.WARNING_MESSAGE);
 					return;
 				} else if (v_newTag.equals("")) {
-					JOptionPane.showMessageDialog(null, "You cannot use empty value for tag!", "Error",
+					JOptionPane.showMessageDialog(null, getLocaledItem("empty_tag_value"), getLocaledItem("Error"),
 							JOptionPane.ERROR_MESSAGE);
 					return;
-				} else if (WordController.userWordRegistry.getTagRegistry().getTagIdMap().containsKey(v_newTag)) {
-					JOptionPane.showMessageDialog(null, "Tag \"" + v_newTag + "\" already exists", "Warning",
-							JOptionPane.WARNING_MESSAGE);
+				} else if (WordController.userDataRegistry.getTagRegistry().getTagIdMap().containsKey(v_newTag)) {
+					JOptionPane.showMessageDialog(null,
+							getLocaledItem("Tag") + " \"" + v_newTag + "\" " + getLocaledItem("already exists"),
+							getLocaledItem("Warning"), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 
-				final int answer = JOptionPane.showConfirmDialog(null, "Do you really want to REPLACE the tag?", "Question",
-						JOptionPane.YES_NO_OPTION);
+				final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_replace_tag"),
+						getLocaledItem("Question"), JOptionPane.YES_NO_OPTION);
 
 				if (answer == JOptionPane.YES_OPTION) {
-					WordController.userWordRegistry.getTagRegistry().editTag(tfTag.getText(), tfNewTag.getText());
+					WordController.userDataRegistry.getTagRegistry().editTag(tfTag.getText(), tfNewTag.getText());
 				}
 			}
 		});
@@ -652,18 +679,19 @@ public class EditPanel extends JPanel {
 		panelCenter.add(btnReplaceTag);
 
 		JButton bRemoveUnusedTags = new JButton("Remove all unused tags");
+		addTrackedItem(bRemoveUnusedTags, "rem_unuse_tags");
 		bRemoveUnusedTags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				final int answer = JOptionPane.showConfirmDialog(null, "Do you really want to REMOVE all unused tags?",
-						"Question", JOptionPane.YES_NO_OPTION);
+				final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_rem_unuse_tags"),
+						getLocaledItem("Question"), JOptionPane.YES_NO_OPTION);
 
 				if (answer == JOptionPane.YES_OPTION) {
-					WordController.userWordRegistry.getTagRegistry().removeAllTags();
+					WordController.userDataRegistry.getTagRegistry().removeAllTags();
 				}
 			}
 		});
-		bRemoveUnusedTags.setMargin(new Insets(2, 7, 2, 7));
-		bRemoveUnusedTags.setBounds(275, 470, 199, 26);
+		bRemoveUnusedTags.setMargin(new Insets(2, 2, 2, 2));
+		bRemoveUnusedTags.setBounds(245, 470, 229, 26);
 		panelCenter.add(bRemoveUnusedTags);
 
 		JPanel panelWest = new JPanel();
@@ -672,10 +700,11 @@ public class EditPanel extends JPanel {
 		add(panelWest, BorderLayout.WEST);
 		panelWest.setLayout(new BorderLayout(0, 0));
 
-		GUIController.searchWords(searchList, null, false, false, "All tags");
+		GUIController.searchWords(searchList, null, false, false, getLocaledItem("All tags"));
 
 		TableModel modelAllWords = new SearchTableModel(searchList);
 		table = new JTable();
+		addTrackedItem(table, "Word", "Translate");
 		table.setModel(modelAllWords);
 		table.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -725,13 +754,18 @@ public class EditPanel extends JPanel {
 		});
 
 		tbWordTranslate = new JToggleButton("W");
-		tbWordTranslate.setPreferredSize(new Dimension(47, 23));
+		addTrackedItem(tbWordTranslate, "W", "T", "order_by_col_w", "order_by_col_t");
+		tbWordTranslate.setToolTipText("order by \"Word\" column");
+		tbWordTranslate.setMargin(new Insets(2, 2, 2, 2));
+		tbWordTranslate.setPreferredSize(new Dimension(30, 25));
 		tbWordTranslate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (tbWordTranslate.isSelected()) {
-					tbWordTranslate.setText("T");
+					tbWordTranslate.setText(getLocaledItem("T"));
+					tbWordTranslate.setToolTipText(getLocaledItem("order_by_col_t"));
 				} else {
-					tbWordTranslate.setText("W");
+					tbWordTranslate.setText(getLocaledItem("W"));
+					tbWordTranslate.setToolTipText(getLocaledItem("order_by_col_w"));
 				}
 				searchWords();
 			}
@@ -739,9 +773,12 @@ public class EditPanel extends JPanel {
 
 		panelFind.add(tbWordTranslate);
 		panelFind.add(tfFindWord);
-		tfFindWord.setColumns(15);
+		tfFindWord.setColumns(17);
 
-		JButton btnClear = new JButton("Clear");
+		JButton btnClear = new JButton("Clean");
+		addTrackedItem(btnClear, "Clean");
+		btnClear.setMargin(new Insets(2, 2, 2, 2));
+		btnClear.setPreferredSize(new Dimension(60, 25));
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tfFindWord.setText(null);
@@ -783,18 +820,21 @@ public class EditPanel extends JPanel {
 		panelFindSouth.add(tfFindTag);
 
 		JLabel lblFindTag = new JLabel("Tag");
+		addTrackedItem(lblFindTag, "Tag");
 		lblFindTag.setHorizontalAlignment(SwingConstants.LEFT);
 		lblFindTag.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblFindTag.setBounds(6, 9, 25, 14);
 		panelFindSouth.add(lblFindTag);
 
 		cbRepTimeOrder = new JCheckBox("Order by repetition time");
+		addTrackedItem(cbRepTimeOrder, "order_rep_time", "order_rep_time", "order_rep_time_hint", "order_rep_time_hint");
 		cbRepTimeOrder.setBounds(6, 37, 160, 24);
 		panelFindSouth.add(cbRepTimeOrder);
 
 		JButton btnHideTranslateColumn = new JButton("Hide \"Translate\"");
-		btnHideTranslateColumn.setMargin(new Insets(2, 7, 2, 7));
-		btnHideTranslateColumn.setBounds(169, 36, 125, 26);
+		addTrackedItem(btnHideTranslateColumn, "hide_translate");
+		btnHideTranslateColumn.setMargin(new Insets(2, 0, 2, 0));
+		btnHideTranslateColumn.setBounds(166, 36, 128, 26);
 		panelFindSouth.add(btnHideTranslateColumn);
 		btnHideTranslateColumn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -809,13 +849,25 @@ public class EditPanel extends JPanel {
 					table.getColumnModel().getColumn(1).setMaxWidth(1000);
 					table.getColumnModel().getColumn(1).setPreferredWidth(150);
 
-					btnHideTranslateColumn.setText("Hide \"" + table.getColumnName(1) + "\"");
+					if (table.getColumnName(1).startsWith(getLocaledItem("W"))) {
+						btnHideTranslateColumn.setText(getLocaledItem("hide_word"));
+						addTrackedItem(btnHideTranslateColumn, "hide_word");
+					} else {
+						btnHideTranslateColumn.setText(getLocaledItem("hide_translate"));
+						addTrackedItem(btnHideTranslateColumn, "hide_translate");
+					}
 				} else {
 					table.getColumnModel().getColumn(1).setWidth(0);
 					table.getColumnModel().getColumn(1).setMinWidth(0);
 					table.getColumnModel().getColumn(1).setMaxWidth(0);
 
-					btnHideTranslateColumn.setText("Show \"" + table.getColumnName(1) + "\"");
+					if (table.getColumnName(1).startsWith(getLocaledItem("W"))) {
+						btnHideTranslateColumn.setText(getLocaledItem("show_word"));
+						addTrackedItem(btnHideTranslateColumn, "show_word");
+					} else {
+						btnHideTranslateColumn.setText(getLocaledItem("show_translate"));
+						addTrackedItem(btnHideTranslateColumn, "show_translate");
+					}
 				}
 			}
 		});
@@ -827,8 +879,6 @@ public class EditPanel extends JPanel {
 
 		showWordsCount();
 		refreshFindTags(null);
-		// btnHideTranslateColumn.doClick();
-		// cbRepTimeOrder.doClick();
 	}
 
 	private void setWordInEditArea(Word word) {
@@ -845,6 +895,7 @@ public class EditPanel extends JPanel {
 		final int box = word == null ? -1 : word.getBox();
 
 		refreshEditorTags(editedWord);
+		refreshComboBox();
 
 		tfWord.setText(wordStr);
 		tfTranslate.setText(translateStr);
@@ -860,6 +911,14 @@ public class EditPanel extends JPanel {
 		comboBox.setSelectedIndex(box);
 	}
 
+	@SuppressWarnings("unchecked")
+	private void refreshComboBox() {
+		comboBox.removeAllItems();
+		for (int i = 0; i < WordController.repeatPeriodArray.length; i++) {
+			comboBox.addItem(WordController.getBoxInfo(i));
+		}
+	}
+
 	private boolean isDefinedWord() {
 		boolean isDefined = editedWord == null ? false
 				: tfWord.getText().equals(editedWord.getWord()) && tfTranslate.getText().equals(editedWord.getTranslate())
@@ -867,7 +926,8 @@ public class EditPanel extends JPanel {
 								|| (!tfEditWord.getText().trim().equals("") && !tfEditTranslate.getText().trim().equals("")));
 
 		if (!isDefined) {
-			JOptionPane.showMessageDialog(null, "Undefined word", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, getLocaledItem("Undefined word"), getLocaledItem("Error"),
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 		editState = EditState.READ;
@@ -876,6 +936,10 @@ public class EditPanel extends JPanel {
 	}
 
 	private void searchWords() {
+		int index = cmbFindTag.getSelectedIndex();
+		refreshFindTags(tfFindTag.getText());
+		cmbFindTag.setSelectedIndex(index);
+
 		GUIController.searchWords(searchList, tfFindWord.getText(), tbWordTranslate.isSelected(), cbRepTimeOrder.isSelected(),
 				(String) cmbFindTag.getSelectedItem());
 		table.getSelectionModel().clearSelection();
@@ -904,7 +968,6 @@ public class EditPanel extends JPanel {
 				comboBox.setSelectedIndex(newIndex);
 			}
 		} catch (Exception e) {
-			// nothing to do
 		}
 	}
 
@@ -936,11 +999,11 @@ public class EditPanel extends JPanel {
 
 	@SuppressWarnings("unchecked")
 	private void refreshFindTags(String p_tag) {
-		List<String> v_allTagList = WordController.userWordRegistry.getTagRegistry().obtainTagList();
+		List<String> v_allTagList = WordController.userDataRegistry.getTagRegistry().obtainTagList();
 		String v_tag = p_tag == null ? "" : p_tag.trim().toUpperCase();
 
 		cmbFindTag.removeAllItems();
-		cmbFindTag.addItem("All tags");
+		cmbFindTag.addItem(getLocaledItem("All tags"));
 
 		v_allTagList.stream().filter(t -> t.contains(v_tag) || v_tag.equals("")).forEach(cmbFindTag::addItem);
 

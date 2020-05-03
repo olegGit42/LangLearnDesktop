@@ -1,5 +1,7 @@
 package com.app.colibri.controller;
 
+import static com.app.colibri.service.AppSettings.getLocaledItem;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,11 +11,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.app.colibri.model.Word;
 import com.app.colibri.registry.TagRegistry;
-import com.app.colibri.registry.UserWordRegistry;
+import com.app.colibri.registry.UserDataRegistry;
+import com.app.colibri.service.AppRun;
+import com.app.colibri.service.AppSettings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WordController {
@@ -37,20 +42,20 @@ public class WordController {
 	public static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	public static final Date date = new Date();
 
-	public static UserWordRegistry userWordRegistry;
+	public static UserDataRegistry userDataRegistry;
 
 	static {
 		final long day_delta = hour_ms * 6;
 
 		repeatPeriodArray = new String[8];
-		repeatPeriodArray[0] = "2 min";
-		repeatPeriodArray[1] = "25 min";
-		repeatPeriodArray[2] = "day";
-		repeatPeriodArray[3] = "3 days";
-		repeatPeriodArray[4] = "week";
-		repeatPeriodArray[5] = "2 weeks";
-		repeatPeriodArray[6] = "month";
-		repeatPeriodArray[7] = "Archive";
+		repeatPeriodArray[0] = "period_box_0";
+		repeatPeriodArray[1] = "period_box_1";
+		repeatPeriodArray[2] = "period_box_2";
+		repeatPeriodArray[3] = "period_box_3";
+		repeatPeriodArray[4] = "period_box_4";
+		repeatPeriodArray[5] = "period_box_5";
+		repeatPeriodArray[6] = "period_box_6";
+		repeatPeriodArray[7] = "period_box_7";
 
 		timeDeltaArray = new long[8];
 		timeDeltaArray[0] = minute_ms * 2;
@@ -85,11 +90,11 @@ public class WordController {
 
 	@SuppressWarnings("unchecked")
 	private static void unserializeAllWordsFromFile(String path) {
-		userWordRegistry = AppRun.appContext.getBean("userWordRegistry", UserWordRegistry.class);
+		userDataRegistry = AppRun.appContext.getBean("userDataRegistry", UserDataRegistry.class);
 
 		if (path.endsWith(".bin")) {
 			try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path))) {
-				userWordRegistry.setAllUserWordsList((List<Word>) objectInputStream.readObject());
+				userDataRegistry.setAllUserWordsList((List<Word>) objectInputStream.readObject());
 			} catch (Exception e) {
 				System.err.println("File " + path + " not found");
 			}
@@ -98,17 +103,18 @@ public class WordController {
 
 			// JSON file to Java object
 			try {
-				userWordRegistry = mapper.readValue(new File(path), UserWordRegistry.class);
-				if (userWordRegistry.getTagRegistry() == null) { // for compatibility
-					userWordRegistry.setTagRegistry(AppRun.appContext.getBean("tagRegistry", TagRegistry.class));
+				userDataRegistry = mapper.readValue(new File(path), UserDataRegistry.class);
+				if (userDataRegistry.getTagRegistry() == null) { // for compatibility
+					userDataRegistry.setTagRegistry(AppRun.appContext.getBean("tagRegistry", TagRegistry.class));
 				}
-				userWordRegistry.getTagRegistry().restoreTagIdMap();
+				userDataRegistry.getTagRegistry().restoreTagIdMap();
+				AppSettings.appSettings.setAppLocale(Locale.forLanguageTag(userDataRegistry.getAppLocale()));
 			} catch (Exception e) {
 				System.err.println("File " + path + " not found");
 			}
 		}
 
-		allWordsList = userWordRegistry.getAllUserWordsList();
+		allWordsList = userDataRegistry.getAllUserWordsList();
 
 		maxId = 0;
 
@@ -132,7 +138,7 @@ public class WordController {
 
 			// Java object to JSON file
 			try {
-				mapper.writeValue(new File(path), userWordRegistry);
+				mapper.writeValue(new File(path), userDataRegistry);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -155,7 +161,7 @@ public class WordController {
 
 	public static String getRepeatPeriod(final int box) {
 		if (0 <= box && box < repeatPeriodArray.length) {
-			return repeatPeriodArray[box];
+			return getLocaledItem(repeatPeriodArray[box]);
 		} else {
 			return "";
 		}
@@ -191,7 +197,7 @@ public class WordController {
 	}
 
 	public static String getBoxInfo(int box) {
-		return String.valueOf(box) + " | " + WordController.repeatPeriodArray[box];
+		return String.valueOf(box) + " | " + getLocaledItem(repeatPeriodArray[box]);
 	}
 
 }

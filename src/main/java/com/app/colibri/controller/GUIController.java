@@ -3,6 +3,7 @@ package com.app.colibri.controller;
 import static com.app.colibri.controller.WordController.allWordsList;
 import static com.app.colibri.controller.WordController.getRoundedTimeToMinute;
 import static com.app.colibri.controller.WordController.getTimeDelta;
+import static com.app.colibri.service.AppSettings.getLocaledItem;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -82,7 +83,7 @@ public class GUIController {
 		}
 
 		private static boolean tagCondition(final Word word, final String tag) {
-			return tag.equals("All tags") || word.isContainTag(tag);
+			return tag.equals(getLocaledItem("All tags")) || word.isContainTag(tag);
 		}
 
 		private static boolean nullCondition() {

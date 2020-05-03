@@ -51,7 +51,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.app.colibri.controller.AppRun</mainClass>
+							<mainClass>com.app.colibri.service.AppRun</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

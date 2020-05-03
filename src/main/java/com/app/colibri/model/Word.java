@@ -63,7 +63,7 @@ public class Word implements Serializable {
 	}
 
 	public void putTag(String p_tag) {
-		putTag(WordController.userWordRegistry.getTagRegistry().putTag(p_tag));
+		putTag(WordController.userDataRegistry.getTagRegistry().putTag(p_tag));
 	}
 
 	public void putTag(int p_tagID) {
@@ -78,7 +78,7 @@ public class Word implements Serializable {
 	}
 
 	public void removeTag(String p_tag) {
-		removeTag(WordController.userWordRegistry.getTagRegistry().putTag(p_tag));
+		removeTag(WordController.userDataRegistry.getTagRegistry().putTag(p_tag));
 	}
 
 	public void removeTag(int p_tagID) {
@@ -93,14 +93,14 @@ public class Word implements Serializable {
 		List<String> v_tagList = new ArrayList<>();
 
 		for (int v_tagID : tagIdSet) {
-			v_tagList.add(WordController.userWordRegistry.getTagRegistry().obtainTagById(v_tagID));
+			v_tagList.add(WordController.userDataRegistry.getTagRegistry().obtainTagById(v_tagID));
 		}
 
 		return v_tagList;
 	}
 
 	public boolean isContainTag(String p_tag) {
-		return isContainTag(WordController.userWordRegistry.getTagRegistry().obtainIdByTag(p_tag));
+		return isContainTag(WordController.userDataRegistry.getTagRegistry().obtainIdByTag(p_tag));
 	}
 
 	public boolean isContainTag(int p_tagID) {

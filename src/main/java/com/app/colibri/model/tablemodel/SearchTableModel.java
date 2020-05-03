@@ -1,5 +1,7 @@
 package com.app.colibri.model.tablemodel;
 
+import static com.app.colibri.service.AppSettings.getLocaledItem;
+
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -31,9 +33,9 @@ public class SearchTableModel extends AbstractTableModel {
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return "Word";
+			return getLocaledItem("Word");
 		case 1:
-			return "Translate";
+			return getLocaledItem("Translate");
 		}
 		return "No data";
 	}

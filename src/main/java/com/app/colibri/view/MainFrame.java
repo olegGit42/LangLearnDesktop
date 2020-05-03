@@ -11,6 +11,8 @@ import javax.swing.JScrollPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.app.colibri.service.MainLocaleManager;
+
 public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 6583031504249305339L;
 
@@ -27,6 +29,7 @@ public class MainFrame extends JFrame {
 	}
 
 	public void init() {
+		MainLocaleManager.addTrackedItem(this, "app_name");
 		final String imgPath = "colibri_icon.png";
 		this.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getClassLoader().getResource(imgPath)));
 

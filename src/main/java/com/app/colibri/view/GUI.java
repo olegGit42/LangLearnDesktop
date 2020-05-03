@@ -1,12 +1,15 @@
 package com.app.colibri.view;
 
 import static com.app.colibri.controller.WordController.getBoxInfo;
+import static com.app.colibri.service.AppSettings.getLocaledItem;
+import static com.app.colibri.service.MainLocaleManager.addTrackedItem;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,7 +17,9 @@ import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -37,15 +42,16 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import com.app.colibri.controller.AppRun;
 import com.app.colibri.controller.GUIController;
-import com.app.colibri.controller.NotificationSound;
 import com.app.colibri.controller.WordController;
 import com.app.colibri.model.Box;
 import com.app.colibri.model.Word;
 import com.app.colibri.model.tablemodel.AllWordsTableModel;
 import com.app.colibri.model.tablemodel.BoxesTableModel;
 import com.app.colibri.model.tablemodel.RepeateTableModel;
+import com.app.colibri.service.AppRun;
+import com.app.colibri.service.AppSettings;
+import com.app.colibri.service.NotificationSound;
 import com.app.colibri.view.buttons.RefreshButton;
 import com.app.colibri.view.chart.BadRememberWordChartFactory;
 import com.app.colibri.view.listeners.TextFieldClipboardMouseAdapter;
@@ -55,10 +61,17 @@ import com.app.colibri.view.panels.EditPanel;
 public class GUI {
 
 	public static final List<Word> repeatedWordList = new ArrayList<Word>();
+	public static final Map<String, String> localeSwitchMap;
 
 	private JButton bAdd;
 	private JTextField newWord;
 	private JTextField translate;
+
+	static {
+		localeSwitchMap = new HashMap<>();
+		localeSwitchMap.put("EN", "RU");
+		localeSwitchMap.put("RU", "EN");
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public GUI() {
@@ -66,18 +79,36 @@ public class GUI {
 		// __________________________________________________________________________________________________________________________________
 		// --------------------------------------------------[Upper panel]
 
+		// --------[Lang begin]
+
+		JPanel pnlSwitchLang = new JPanel();
+		JButton btnSwithLang = new JButton(WordController.userDataRegistry.getAppLocale());
+		btnSwithLang.setMargin(new Insets(2, 2, 2, 2));
+		btnSwithLang.setPreferredSize(new Dimension(30, 25));
+		pnlSwitchLang.add(btnSwithLang);
+		btnSwithLang.addActionListener(e -> {
+			String lang = localeSwitchMap.get(btnSwithLang.getText());
+			btnSwithLang.setText(lang);
+			AppSettings.changeLocale(lang);
+		});
+
+		// --------[Lang end]
+
 		JPanel inputWordPanel = new JPanel();
 
 		JPanel inputWordWithSave = new JPanel(new BorderLayout());
 		inputWordWithSave.add(inputWordPanel, BorderLayout.CENTER);
+		inputWordWithSave.add(pnlSwitchLang, BorderLayout.WEST);
 
 		JPanel iWt = new JPanel(new BorderLayout(0, 2));
 		inputWordPanel.add(iWt, BorderLayout.WEST);
 
 		JLabel newWordL = new JLabel("New word", SwingConstants.RIGHT);
+		addTrackedItem(newWordL, "New word");
 		iWt.add(newWordL, BorderLayout.NORTH);
 
 		JLabel translateL = new JLabel("Translate", SwingConstants.RIGHT);
+		addTrackedItem(translateL, "Translate");
 		iWt.add(translateL, BorderLayout.SOUTH);
 
 		JPanel iWl = new JPanel(new BorderLayout());
@@ -100,8 +131,9 @@ public class GUI {
 		inputWordPanel.add(iWr);
 
 		bAdd = new JButton();
+		addTrackedItem(bAdd, null, "bAddTooltipTime");
+		bAdd.setToolTipText(getLocaledItem("bAddTooltipTime"));
 		bAdd.setPreferredSize(new Dimension(60, 40));
-		bAdd.setToolTipText("Show repetition time");
 		bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("time32.png")));
 		iWr.add(bAdd);
 		bAdd.addActionListener(e -> {
@@ -121,10 +153,9 @@ public class GUI {
 					try {
 						WordController.createNewWordGUI(newWordStr, translateStr);
 						WordController.serializeAllWordsMain();
-						// JOptionPane.showMessageDialog(null, "Successfully ADDED", "Info",
-						// JOptionPane.INFORMATION_MESSAGE);
 					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(null, "ADDING error!", "Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, getLocaledItem("add_error"), getLocaledItem("Error"),
+								JOptionPane.ERROR_MESSAGE);
 					}
 
 					translate.setText("");
@@ -132,7 +163,8 @@ public class GUI {
 				} else {
 					newWord.setText(newWord.getText().trim());
 					translate.setText(translate.getText().trim());
-					JOptionPane.showMessageDialog(null, "This word has already been added!", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, getLocaledItem("already_added"), getLocaledItem("Error"),
+							JOptionPane.ERROR_MESSAGE);
 				}
 
 			} else {
@@ -141,12 +173,13 @@ public class GUI {
 
 				String recurenceTime;
 				if (WordController.minRepeatTime == Long.MAX_VALUE) {
-					recurenceTime = "You have no words to repeat";
+					recurenceTime = getLocaledItem("no_repeat_word");
 				} else {
 					recurenceTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date(WordController.minRepeatTime));
 				}
 
-				JOptionPane.showMessageDialog(null, recurenceTime, "Repetition time", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, recurenceTime, getLocaledItem("Repetition time"),
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 
@@ -165,6 +198,7 @@ public class GUI {
 
 		TableModel modelRepeate = new RepeateTableModel(repeatedWordList);
 		JTable tableRepeate = new JTable(modelRepeate);
+		addTrackedItem(tableRepeate, null, "Word", "Period", "Box");
 		tableRepeate.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableRepeate.setRowSorter(new TableRowSorter(modelRepeate));
 		tableRepeate.setAutoCreateRowSorter(true);
@@ -186,6 +220,7 @@ public class GUI {
 		repeat.add(scrollPaneTableRepeate, BorderLayout.CENTER);
 
 		JButton refreshRepeate = new JButton("Refresh");
+		addTrackedItem(refreshRepeate, "Refresh");
 		repeat.add(refreshRepeate, BorderLayout.NORTH);
 
 		Timer timer = new Timer(3 * 1000, (e -> {
@@ -208,22 +243,26 @@ public class GUI {
 		southRepeatePanel.add(labelsRrepeateLeft);
 
 		JLabel wordRep = new JLabel("Word");
+		addTrackedItem(wordRep, "Word");
 		wordRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(3));
 		labelsRrepeateLeft.add(wordRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(5));
 
 		JLabel translateRep = new JLabel("Translate");
+		addTrackedItem(translateRep, "Translate");
 		translateRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		labelsRrepeateLeft.add(translateRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(2));
 
 		JLabel boxRep = new JLabel("Box");
+		addTrackedItem(boxRep, "Box");
 		boxRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		labelsRrepeateLeft.add(boxRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(4));
 
 		JLabel newBoxRep = new JLabel("New box");
+		addTrackedItem(newBoxRep, "New box");
 		newBoxRep.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
 		labelsRrepeateLeft.add(newBoxRep);
 		labelsRrepeateLeft.add(getVerticalPadForBoxLayout(6));
@@ -268,6 +307,7 @@ public class GUI {
 		pShowRepeatButtons.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
 
 		JButton bShowRep = new JButton();
+		addTrackedItem(bShowRep, null, "Show translation");
 		bShowRep.setToolTipText("Show translation");
 		bShowRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("eye25.png")));
 		// bShowRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -340,6 +380,7 @@ public class GUI {
 		labelsRepeateRight.add(pSaveRepeatButtons);
 
 		JButton bSaveRep = new JButton();
+		addTrackedItem(bSaveRep, null, "Save new box");
 		bSaveRep.setToolTipText("Save new box");
 		bSaveRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("save21.png")));
 		// bSaveRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -374,6 +415,7 @@ public class GUI {
 		pForgotButton.add(getVerticalPadForBoxLayout(20));
 
 		JButton bSaveZeroRep = new JButton();
+		addTrackedItem(bSaveZeroRep, null, "Forgot");
 		bSaveZeroRep.setToolTipText("Forgot");
 		bSaveZeroRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("forgot51.png")));
 		bSaveZeroRep.setPreferredSize(new Dimension(61, 61));
@@ -399,6 +441,12 @@ public class GUI {
 					wordRepText.setText(String.valueOf(model.getValueAt(selIndex, 1)));
 					translateRepText.setText(null);
 					boxValueRep.setText(" ");
+
+					newBoxText.removeAllItems();
+					for (int i = 0; i < WordController.repeatPeriodArray.length; i++) {
+						newBoxText.addItem(WordController.getBoxInfo(i));
+					}
+
 					newBoxText.setSelectedIndex(-1);
 				} catch (Exception ex) {
 				}
@@ -453,6 +501,10 @@ public class GUI {
 		tableBoxesList.add(scrollPaneTableB5.getTable());
 		tableBoxesList.add(scrollPaneTableB6.getTable());
 
+		for (int i = 0; i < tableBoxesList.size(); i++) {
+			addTrackedItem(tableBoxesList.get(i), "Box " + i);
+		}
+
 		JButton refreshBoxes = new RefreshButton(Box::refreshBox, tableBoxesList);
 		boxesMain.add(refreshBoxes, BorderLayout.NORTH);
 
@@ -464,6 +516,7 @@ public class GUI {
 
 		TableModel modelAllWords = new AllWordsTableModel(WordController.allWordsList);
 		JTable tableAllWords = new JTable(modelAllWords);
+		addTrackedItem(tableAllWords, null, "Creation date", "Word", "Translate", "Repeat date", "Box", "Period");
 		tableAllWords.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableAllWords.setAutoCreateRowSorter(true);
 
@@ -471,7 +524,7 @@ public class GUI {
 		allWords.add(scrollPaneTableAllWords, BorderLayout.CENTER);
 
 		tableAllWords.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-		tableAllWords.getColumnModel().getColumn(0).setMaxWidth(30);
+		tableAllWords.getColumnModel().getColumn(0).setMaxWidth(40);
 
 		tableAllWords.getColumnModel().getColumn(1).setMaxWidth(100);
 		tableAllWords.getColumnModel().getColumn(1).setMinWidth(100);
@@ -483,12 +536,12 @@ public class GUI {
 		tableAllWords.getColumnModel().getColumn(4).setMinWidth(100);
 
 		tableAllWords.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-		tableAllWords.getColumnModel().getColumn(5).setMaxWidth(30);
-		tableAllWords.getColumnModel().getColumn(5).setMinWidth(30);
+		tableAllWords.getColumnModel().getColumn(5).setMaxWidth(45);
+		tableAllWords.getColumnModel().getColumn(5).setMinWidth(45);
 
 		tableAllWords.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
-		tableAllWords.getColumnModel().getColumn(6).setMaxWidth(50);
-		tableAllWords.getColumnModel().getColumn(6).setMinWidth(50);
+		tableAllWords.getColumnModel().getColumn(6).setMaxWidth(55);
+		tableAllWords.getColumnModel().getColumn(6).setMinWidth(55);
 
 		JButton refreshAllWords = new RefreshButton(tableAllWords);
 		allWords.add(refreshAllWords, BorderLayout.NORTH);
@@ -498,6 +551,7 @@ public class GUI {
 		// --------------------------------------------------[Panels_end]
 
 		JTabbedPane tabbedPane = new JTabbedPane();
+		addTrackedItem(tabbedPane, "Repeat", "Bad remembered words", "Boxes", "All words", "Editor");
 		mainPanel.add(tabbedPane);
 		tabbedPane.setPreferredSize(new Dimension(800, 600));
 		tabbedPane.add("Repeat", repeat);
@@ -509,6 +563,8 @@ public class GUI {
 		MainFrame mainFrame = AppRun.appContext.getBean("mainFrame", MainFrame.class);
 		mainFrame.setUpScrollPane(new JScrollPane(inputWordWithSave));
 		mainFrame.setDownScrollPane(new JScrollPane(mainPanel));
+
+		AppSettings.changeLocale(WordController.userDataRegistry.getAppLocale());
 	}
 
 	public Component getVerticalPadForBoxLayout(final int pad) {
@@ -518,10 +574,12 @@ public class GUI {
 	private void bAddButtonStateChange() {
 		if (newWord.getText().trim().equals("") || translate.getText().trim().equals("")) {
 			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("time32.png")));
-			bAdd.setToolTipText("Show repetition time");
+			bAdd.setToolTipText(getLocaledItem("bAddTooltipTime"));
+			addTrackedItem(bAdd, null, "bAddTooltipTime");
 		} else {
 			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("add32.png")));
-			bAdd.setToolTipText("Add new word");
+			bAdd.setToolTipText(getLocaledItem("bAddTooltipAdd"));
+			addTrackedItem(bAdd, null, "bAddTooltipAdd");
 		}
 	}
 

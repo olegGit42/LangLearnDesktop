@@ -1,5 +1,7 @@
 package com.app.colibri.view.chart;
 
+import static com.app.colibri.service.MainLocaleManager.addTrackedItem;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -53,6 +55,7 @@ public class BadRememberWordChartFactory {
 		chart = ChartFactory.createBarChart3D(null, null, // x-axis label
 				"Repetitions number", // y-axis label
 				dataset);
+		addTrackedItem(chart, "Repetitions number");
 		chart.setBackgroundPaint(Color.white);
 
 		CategoryPlot plot = (CategoryPlot) chart.getPlot();

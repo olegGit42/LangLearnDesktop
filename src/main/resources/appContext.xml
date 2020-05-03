@@ -15,11 +15,17 @@
 
 	<bean id="mainFrame" class="com.app.colibri.view.MainFrame"
 		scope="prototype" init-method="init">
-		<constructor-arg name="title" value="Colibri v1.0.1.5" />
+		<!-- <constructor-arg name="title" value="Colibri v1.0.1.5" /> -->
 	</bean>
 
 	<bean id="mainFrameListener"
 		class="com.app.colibri.view.listeners.MainFrameListener"
 		scope="prototype" />
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="/locales/messages" />
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
 
 </beans>

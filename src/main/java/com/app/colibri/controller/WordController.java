@@ -3,10 +3,6 @@ package com.app.colibri.controller;
 import static com.app.colibri.service.AppSettings.getLocaledItem;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,11 +10,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.app.colibri.model.User;
 import com.app.colibri.model.Word;
-import com.app.colibri.registry.TagRegistry;
 import com.app.colibri.registry.UserDataRegistry;
 import com.app.colibri.service.AppRun;
 import com.app.colibri.service.AppSettings;
+import com.app.colibri.service.crypt.CryptoException;
+import com.app.colibri.service.crypt.CryptoUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WordController {
@@ -83,30 +81,22 @@ public class WordController {
 		// serializeAllWordsToFile("words.bin"); // for compatibility
 	}
 
-	public static void serializeAllWordsCopy() {
-		serializeAllWordsToFile("wordsCopy.json"); // main
-		// serializeAllWordsToFile("wordsCopy.bin"); // for compatibility
-	}
-
-	@SuppressWarnings("unchecked")
 	private static void unserializeAllWordsFromFile(String path) {
 		userDataRegistry = AppRun.appContext.getBean("userDataRegistry", UserDataRegistry.class);
 
-		if (path.endsWith(".bin")) {
-			try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(path))) {
-				userDataRegistry.setAllUserWordsList((List<Word>) objectInputStream.readObject());
-			} catch (Exception e) {
-				System.err.println("File " + path + " not found");
-			}
-		} else if (path.endsWith(".json")) {
+		if (path.endsWith(".json")) {
 			ObjectMapper mapper = new ObjectMapper();
 
 			// JSON file to Java object
 			try {
 				userDataRegistry = mapper.readValue(new File(path), UserDataRegistry.class);
-				if (userDataRegistry.getTagRegistry() == null) { // for compatibility
-					userDataRegistry.setTagRegistry(AppRun.appContext.getBean("tagRegistry", TagRegistry.class));
-				}
+				// begin for compatibility
+				User user = AppSettings.appSettings.getUser();
+				userDataRegistry.setUserName(user.getUserName());
+				userDataRegistry.setUserPasswordHash(user.getUserPasswordHash());
+				userDataRegistry.setAutoEnter(user.isAutoEnter());
+				// end for compatibility
+
 				userDataRegistry.getTagRegistry().restoreTagIdMap();
 				AppSettings.appSettings.setAppLocale(Locale.forLanguageTag(userDataRegistry.getAppLocale()));
 			} catch (Exception e) {
@@ -124,21 +114,48 @@ public class WordController {
 		});
 
 		newId.set(maxId);
+		userDataRegistry.setMaxWordID(maxId); // for compatibility
 	}
 
 	private static void serializeAllWordsToFile(String path) {
-		if (path.endsWith(".bin")) {
-			try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(path))) {
-				objectOutputStream.writeObject(allWordsList);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		} else if (path.endsWith(".json")) {
+		if (path.endsWith(".json")) {
 			ObjectMapper mapper = new ObjectMapper();
 
 			// Java object to JSON file
 			try {
-				mapper.writeValue(new File(path), userDataRegistry);
+				userDataRegistry.setMaxWordID(newId.get());
+
+				File dataFile = new File(path);
+				mapper.writeValue(dataFile, userDataRegistry);
+
+				String currentUserDataDirPath = "UserData/" + AppSettings.appSettings.getUser().getUserName();
+
+				File curentUserDataDir = new File(currentUserDataDirPath);
+				if (!curentUserDataDir.isDirectory()) {
+					curentUserDataDir.mkdir();
+				}
+
+				File dataEncryptedFile = new File(currentUserDataDirPath + "/Data.encrypted");
+				File userEncryptedFile = new File(currentUserDataDirPath + "/User.encrypted");
+				File autoEnterUserEncryptedFile = new File("User.encrypted");
+
+				User currentUser = AppSettings.appSettings.getUser();
+				String jsonUser = mapper.writeValueAsString(currentUser);
+				String jsonData = mapper.writeValueAsString(userDataRegistry);
+
+				try {
+					CryptoUtils.encrypt(AppSettings.KEY, jsonData, dataEncryptedFile);
+					CryptoUtils.encrypt(AppSettings.KEY, jsonUser, userEncryptedFile);
+					if (currentUser.isAutoEnter()) {
+						CryptoUtils.encrypt(AppSettings.KEY, jsonUser, autoEnterUserEncryptedFile);
+					} else if (autoEnterUserEncryptedFile.exists()) {
+						autoEnterUserEncryptedFile.delete();
+					}
+				} catch (CryptoException ex) {
+					System.err.println(ex.getMessage());
+					ex.printStackTrace();
+				}
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

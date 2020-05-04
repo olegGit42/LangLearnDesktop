@@ -1,5 +1,7 @@
 package com.app.colibri.service;
 
+import java.io.File;
+
 import javax.swing.SwingUtilities;
 
 import org.springframework.context.ApplicationContext;
@@ -14,6 +16,10 @@ public class AppRun {
 	public static ApplicationContext appContext;
 
 	static {
+		File userDataDir = new File("UserData");
+		if (!userDataDir.isDirectory()) {
+			userDataDir.mkdir();
+		}
 		appContext = new ClassPathXmlApplicationContext("appContext.xml");
 		AppSettings.appSettings = appContext.getBean("appSettings", AppSettings.class);
 		MainLocaleManager.mainLocaleManager = appContext.getBean("mainLocaleManager", MainLocaleManager.class);
@@ -26,7 +32,6 @@ public class AppRun {
 
 	public static void init() {
 		WordController.unserializeAllWordsMain();
-		WordController.serializeAllWordsCopy();
 		Box.fillBoxes();
 		/*
 		 * try { // Set System L&F

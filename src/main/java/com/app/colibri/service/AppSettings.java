@@ -3,10 +3,12 @@ package com.app.colibri.service;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import com.app.colibri.controller.WordController;
+import com.app.colibri.model.User;
 
 import lombok.Data;
 
@@ -15,9 +17,13 @@ import lombok.Data;
 public class AppSettings {
 
 	public static AppSettings appSettings;
+	public static final String KEY = "WgeD3PXESApMqc2h";
 
 	@Autowired
 	private MessageSource localeSource;
+	@Autowired
+	@Qualifier(value = "defaultUser")
+	private User user;
 	private Locale appLocale = Locale.forLanguageTag("EN");
 
 	public AppSettings() {

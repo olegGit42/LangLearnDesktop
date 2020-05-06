@@ -51,6 +51,7 @@ import com.app.colibri.model.tablemodel.BoxesTableModel;
 import com.app.colibri.model.tablemodel.RepeateTableModel;
 import com.app.colibri.service.AppRun;
 import com.app.colibri.service.AppSettings;
+import com.app.colibri.service.MainLocaleManager;
 import com.app.colibri.service.NotificationSound;
 import com.app.colibri.view.buttons.RefreshButton;
 import com.app.colibri.view.chart.BadRememberWordChartFactory;
@@ -62,6 +63,8 @@ public class GUI {
 
 	public static final List<Word> repeatedWordList = new ArrayList<Word>();
 	public static final Map<String, String> localeSwitchMap;
+	public static MainFrame mainFrame = null;
+	public static LoginFrame loginFrame = null;
 
 	private JButton bAdd;
 	private JTextField newWord;
@@ -79,12 +82,13 @@ public class GUI {
 		// __________________________________________________________________________________________________________________________________
 		// --------------------------------------------------[Upper panel]
 
-		// --------[Lang begin]
+		// --------[Lang button begin]
 
 		JPanel pnlSwitchLang = new JPanel();
 		JButton btnSwithLang = new JButton(WordController.userDataRegistry.getAppLocale());
+		addTrackedItem(btnSwithLang, "EN");
 		btnSwithLang.setMargin(new Insets(2, 2, 2, 2));
-		btnSwithLang.setPreferredSize(new Dimension(30, 25));
+		btnSwithLang.setPreferredSize(new Dimension(34, 25));
 		pnlSwitchLang.add(btnSwithLang);
 		btnSwithLang.addActionListener(e -> {
 			String lang = localeSwitchMap.get(btnSwithLang.getText());
@@ -92,13 +96,29 @@ public class GUI {
 			AppSettings.changeLocale(lang);
 		});
 
-		// --------[Lang end]
+		// --------[Lang button end]
+
+		// --------[Change user button begin]
+
+		JPanel pnlChangeUser = new JPanel();
+		JButton btnChangeUser = new JButton();
+		addTrackedItem(btnChangeUser, null, "Change user");
+		btnChangeUser.setMargin(new Insets(2, 2, 2, 2));
+		btnChangeUser.setPreferredSize(new Dimension(34, 34));
+		btnChangeUser.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/change_user30.png")));
+		pnlChangeUser.add(btnChangeUser);
+		btnChangeUser.addActionListener(e -> {
+			LoginFrame.launch(LoginFrame.State.LOGIN);
+		});
+
+		// --------[Change user button end]
 
 		JPanel inputWordPanel = new JPanel();
 
 		JPanel inputWordWithSave = new JPanel(new BorderLayout());
 		inputWordWithSave.add(inputWordPanel, BorderLayout.CENTER);
 		inputWordWithSave.add(pnlSwitchLang, BorderLayout.WEST);
+		inputWordWithSave.add(pnlChangeUser, BorderLayout.EAST);
 
 		JPanel iWt = new JPanel(new BorderLayout(0, 2));
 		inputWordPanel.add(iWt, BorderLayout.WEST);
@@ -134,7 +154,7 @@ public class GUI {
 		addTrackedItem(bAdd, null, "bAddTooltipTime");
 		bAdd.setToolTipText(getLocaledItem("bAddTooltipTime"));
 		bAdd.setPreferredSize(new Dimension(60, 40));
-		bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("time32.png")));
+		bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/time32.png")));
 		iWr.add(bAdd);
 		bAdd.addActionListener(e -> {
 			String newWordStr = newWord.getText().trim();
@@ -309,7 +329,7 @@ public class GUI {
 		JButton bShowRep = new JButton();
 		addTrackedItem(bShowRep, null, "Show translation");
 		bShowRep.setToolTipText("Show translation");
-		bShowRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("eye25.png")));
+		bShowRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/eye25.png")));
 		// bShowRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		bShowRep.setPreferredSize(new Dimension(61, 20));
 		labelsRepeateRight.add(getVerticalPadForBoxLayout(20));
@@ -382,7 +402,7 @@ public class GUI {
 		JButton bSaveRep = new JButton();
 		addTrackedItem(bSaveRep, null, "Save new box");
 		bSaveRep.setToolTipText("Save new box");
-		bSaveRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("save21.png")));
+		bSaveRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/save21.png")));
 		// bSaveRep.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		bSaveRep.setPreferredSize(new Dimension(61, 25));
 		pSaveRepeatButtons.add(bSaveRep);
@@ -417,7 +437,7 @@ public class GUI {
 		JButton bSaveZeroRep = new JButton();
 		addTrackedItem(bSaveZeroRep, null, "Forgot");
 		bSaveZeroRep.setToolTipText("Forgot");
-		bSaveZeroRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("forgot51.png")));
+		bSaveZeroRep.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/forgot51.png")));
 		bSaveZeroRep.setPreferredSize(new Dimension(61, 61));
 		pForgotButton.add(bSaveZeroRep);
 		southRepeatePanel.add(pForgotButton);
@@ -560,11 +580,19 @@ public class GUI {
 		tabbedPane.add("All words", allWords);
 		tabbedPane.add("Editor", new EditPanel());
 
-		MainFrame mainFrame = AppRun.appContext.getBean("mainFrame", MainFrame.class);
+		BadRememberWordChartFactory.updateDataset();
+
+		mainFrame = AppRun.appContext.getBean("mainFrame", MainFrame.class);
 		mainFrame.setUpScrollPane(new JScrollPane(inputWordWithSave));
 		mainFrame.setDownScrollPane(new JScrollPane(mainPanel));
 
-		AppSettings.changeLocale(WordController.userDataRegistry.getAppLocale());
+		MainLocaleManager.changeLocaleStatic();
+
+		if (loginFrame != null) {
+			mainFrame.setEnabled(false);
+			loginFrame.getFrame().toFront();
+		}
+
 	}
 
 	public Component getVerticalPadForBoxLayout(final int pad) {
@@ -573,11 +601,11 @@ public class GUI {
 
 	private void bAddButtonStateChange() {
 		if (newWord.getText().trim().equals("") || translate.getText().trim().equals("")) {
-			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("time32.png")));
+			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/time32.png")));
 			bAdd.setToolTipText(getLocaledItem("bAddTooltipTime"));
 			addTrackedItem(bAdd, null, "bAddTooltipTime");
 		} else {
-			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("add32.png")));
+			bAdd.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/add32.png")));
 			bAdd.setToolTipText(getLocaledItem("bAddTooltipAdd"));
 			addTrackedItem(bAdd, null, "bAddTooltipAdd");
 		}

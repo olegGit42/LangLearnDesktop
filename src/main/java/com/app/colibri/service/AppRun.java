@@ -1,15 +1,17 @@
 package com.app.colibri.service;
 
 import java.io.File;
-
-import javax.swing.SwingUtilities;
+import java.io.IOException;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.app.colibri.controller.WordController;
-import com.app.colibri.model.Box;
-import com.app.colibri.view.GUI;
+import com.app.colibri.model.User;
+import com.app.colibri.registry.UserDataRegistry;
+import com.app.colibri.service.crypt.CryptoException;
+import com.app.colibri.service.crypt.CryptoUtils;
+import com.app.colibri.view.LoginFrame;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AppRun {
 
@@ -26,18 +28,74 @@ public class AppRun {
 	}
 
 	public static void main(String[] args) {
-		init();
-		SwingUtilities.invokeLater(GUI::new);
-	}
 
-	public static void init() {
-		WordController.unserializeAllWordsMain();
-		Box.fillBoxes();
-		/*
-		 * try { // Set System L&F
-		 * UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch
-		 * (Exception e) { }
-		 */
+		File autoEnterUserEncryptedFile = new File("User.encrypted");
+		ObjectMapper mapper = new ObjectMapper();
+		User currentUser = AppSettings.appSettings.getUser();
+
+		if (autoEnterUserEncryptedFile.exists()) {
+
+			try {
+				String jsonUser = CryptoUtils.decrypt(AppSettings.KEY, autoEnterUserEncryptedFile);
+				currentUser = mapper.readValue(jsonUser, User.class);
+			} catch (IOException | CryptoException e) {
+				e.printStackTrace();
+			}
+
+			AppSettings.appSettings.setUser(currentUser);
+
+			if (currentUser.isAutoEnter()) {
+
+				if (currentUser.getUserName().equals(User.GUEST)) {
+					LoginFrame.appInit();
+				} else {
+					try {
+						String path = "UserData/" + currentUser.getUserName() + "/Data.encrypted";
+						String jsonData = CryptoUtils.decrypt(AppSettings.KEY, new File(path));
+						UserDataRegistry userDataRegistryForCheck = mapper.readValue(jsonData, UserDataRegistry.class);
+
+						if (currentUser.getUserName().equals(userDataRegistryForCheck.getUserName())
+								&& currentUser.getUserPasswordHash().equals(userDataRegistryForCheck.getUserPasswordHash())
+								&& userDataRegistryForCheck.isAutoEnter()) {
+
+							LoginFrame.appInit();
+						} else {
+							LoginFrame.launch(LoginFrame.State.LOGIN);
+						}
+
+					} catch (CryptoException | IOException e) {
+						e.printStackTrace();
+						LoginFrame.launch(LoginFrame.State.LOGIN);
+					}
+				}
+
+			} else {
+				if (currentUser.getUserName().equals(User.GUEST)) {
+					LoginFrame.appInit();
+				} else {
+					LoginFrame.launch(LoginFrame.State.LOGIN);
+				}
+			}
+
+		} else {
+
+			try {
+				String jsonUser = mapper.writeValueAsString(currentUser);
+
+				try {
+					CryptoUtils.encrypt(AppSettings.KEY, jsonUser, autoEnterUserEncryptedFile);
+				} catch (CryptoException ex) {
+					System.err.println(ex.getMessage());
+					ex.printStackTrace();
+				}
+
+				LoginFrame.appInit();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				LoginFrame.launch(LoginFrame.State.LOGIN);
+			}
+		}
 	}
 
 }

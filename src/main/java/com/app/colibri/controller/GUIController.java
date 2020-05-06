@@ -185,13 +185,25 @@ public class GUIController {
 	}
 
 	public static void addTextFromClipboard(JTextField textField) {
+		installTextFromClipboard(textField, 1);
+	}
+
+	public static void setTextFromClipboard(JTextField textField) {
+		installTextFromClipboard(textField, 2);
+	}
+
+	public static void installTextFromClipboard(JTextField textField, int type) {
 		final String clipboard = getFromClipboard();
 		final String text = textField.getText().trim();
 
-		if (!clipboard.equals("")) {
-			textField.setText(text.equals("") ? clipboard : text.concat(", ".concat(clipboard)));
-		} else {
+		if (clipboard.equals("")) {
 			textField.setText(text);
+		} else {
+			if (type == 1) {
+				textField.setText(text.equals("") ? clipboard : text.concat(", ".concat(clipboard)));
+			} else {
+				textField.setText(clipboard);
+			}
 		}
 	}
 

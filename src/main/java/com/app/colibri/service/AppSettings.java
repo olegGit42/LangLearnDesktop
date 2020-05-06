@@ -50,7 +50,10 @@ public class AppSettings {
 
 	public static void changeLocale(String locale) {
 		appSettings.installLocale(locale);
-		WordController.userDataRegistry.setAppLocale(locale);
+		try {
+			WordController.userDataRegistry.setAppLocale(locale);
+		} catch (Exception e) {
+		}
 		MainLocaleManager.changeLocaleStatic();
 	}
 

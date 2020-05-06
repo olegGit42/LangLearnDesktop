@@ -6,6 +6,8 @@ public interface ILocaleManager<T> {
 
 	public void addTrackedComponent(T component, String... codeArray);
 
+	public void removeAllComponents();
+
 	public boolean checkComponentClass(Object component);
 
 }

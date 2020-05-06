@@ -477,7 +477,7 @@ public class EditPanel extends JPanel {
 		btnBoxPlus.setIconTextGap(0);
 		btnBoxPlus.setBounds(190, 265, 25, 25);
 		panelCenter.add(btnBoxPlus);
-		btnBoxPlus.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("plus21.png")));
+		btnBoxPlus.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/plus21.png")));
 
 		JButton btnBoxMinus = new JButton("");
 		btnBoxMinus.addActionListener(new ActionListener() {
@@ -489,7 +489,7 @@ public class EditPanel extends JPanel {
 		btnBoxMinus.setIconTextGap(0);
 		btnBoxMinus.setBounds(220, 265, 25, 25);
 		panelCenter.add(btnBoxMinus);
-		btnBoxMinus.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("minus21.png")));
+		btnBoxMinus.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/minus21.png")));
 
 		comboBoxTag = new JComboBox();
 		comboBoxTag.setBounds(164, 135, 105, 25);
@@ -507,8 +507,11 @@ public class EditPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					comboBoxEditTag.setSelectedIndex(-1);
-					comboBoxEditTag.setSelectedItem(GUIController.getFromClipboard());
+					String clip = GUIController.getFromClipboard();
+					if (!clip.equals("")) {
+						comboBoxEditTag.setSelectedIndex(-1);
+						comboBoxEditTag.setSelectedItem(GUIController.getFromClipboard());
+					}
 				} else if (e.getButton() == MouseEvent.BUTTON2) {
 					comboBoxEditTag.setSelectedIndex(-1);
 				}
@@ -563,7 +566,7 @@ public class EditPanel extends JPanel {
 		bAddTag.setIconTextGap(0);
 		bAddTag.setBounds(419, 265, 25, 25);
 		panelCenter.add(bAddTag);
-		bAddTag.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("plus21.png")));
+		bAddTag.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/plus21.png")));
 
 		JButton bRemoveTag = new JButton("");
 		bRemoveTag.addMouseListener(new MouseAdapter() {
@@ -591,7 +594,7 @@ public class EditPanel extends JPanel {
 		bRemoveTag.setIconTextGap(0);
 		bRemoveTag.setBounds(449, 265, 25, 25);
 		panelCenter.add(bRemoveTag);
-		bRemoveTag.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("minus21.png")));
+		bRemoveTag.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/minus21.png")));
 
 		JLabel lblTag = new JLabel("Tag");
 		addTrackedItem(lblTag, "Tag");
@@ -605,9 +608,12 @@ public class EditPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					tfTag.setText(GUIController.getFromClipboard());
+					String clip = GUIController.getFromClipboard();
+					if (!clip.equals("")) {
+						tfTag.setText(clip);
+					}
 				} else if (e.getButton() == MouseEvent.BUTTON2) {
-					tfTag.setText(null);
+					tfTag.setText("");
 				} else if (e.getButton() == MouseEvent.BUTTON1) {
 					tfTag.setText((String) cmbFindTag.getSelectedItem());
 				}
@@ -626,16 +632,7 @@ public class EditPanel extends JPanel {
 		panelCenter.add(lblNewTag);
 
 		tfNewTag = new JTextField();
-		tfNewTag.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					tfNewTag.setText(GUIController.getFromClipboard());
-				} else if (e.getButton() == MouseEvent.BUTTON2) {
-					tfNewTag.setText(null);
-				}
-			}
-		});
+		tfNewTag.addMouseListener(new TextFieldClipboardMouseAdapter(tfNewTag, 2));
 		tfNewTag.setColumns(10);
 		tfNewTag.setBounds(290, 416, 95, 20);
 		panelCenter.add(tfNewTag);
@@ -736,7 +733,10 @@ public class EditPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
-					tfFindWord.setText(GUIController.getFromClipboard());
+					String clip = GUIController.getFromClipboard();
+					if (!clip.equals("")) {
+						tfFindWord.setText(clip);
+					}
 					searchWords();
 				} else if (e.getButton() == MouseEvent.BUTTON2) {
 					if (e.getClickCount() > 1) {
@@ -797,18 +797,7 @@ public class EditPanel extends JPanel {
 		panelFindSouth.add(cmbFindTag);
 
 		tfFindTag = new JTextField();
-		tfFindTag.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON3) {
-					tfFindTag.setText(GUIController.getFromClipboard());
-					refreshFindTags(tfFindTag.getText());
-				} else if (e.getButton() == MouseEvent.BUTTON2) {
-					tfFindTag.setText(null);
-					refreshFindTags(tfFindTag.getText());
-				}
-			}
-		});
+		tfFindTag.addMouseListener(new TextFieldClipboardMouseAdapter(tfFindTag, 2));
 		tfFindTag.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {

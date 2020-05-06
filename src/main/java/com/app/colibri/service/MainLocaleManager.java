@@ -41,12 +41,21 @@ public class MainLocaleManager implements ILocaleManager<Object> {
 		return true;
 	}
 
+	@Override
+	public void removeAllComponents() {
+		localeManagerSet.forEach(ILocaleManager::removeAllComponents);
+	}
+
 	public static void changeLocaleStatic() {
 		mainLocaleManager.changeLocale();
 	}
 
 	public static void addTrackedItem(Object component, String... codeArray) {
 		mainLocaleManager.addTrackedComponent(component, codeArray);
+	}
+
+	public static void removeAllItems() {
+		mainLocaleManager.removeAllComponents();
 	}
 
 }

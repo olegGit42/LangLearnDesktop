@@ -8,7 +8,7 @@ import com.app.colibri.controller.WordController;
 
 public class Box {
 
-	public static final List<List<Word>> boxList = new ArrayList<>();;
+	public static final List<List<Word>> boxList = new ArrayList<>();
 
 	static {
 		for (int i = 0; i < 8; i++) {

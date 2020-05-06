@@ -16,6 +16,10 @@ public class JLabelLocaleManager extends ALocaleManager<JLabel> {
 			component.setText(localedString);
 			break;
 
+		case 1:
+			component.setToolTipText(localedString);
+			break;
+
 		default:
 			break;
 		}

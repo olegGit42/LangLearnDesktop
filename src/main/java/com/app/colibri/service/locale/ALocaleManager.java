@@ -41,6 +41,11 @@ public abstract class ALocaleManager<T> implements ILocaleManager<T> {
 		}
 	}
 
+	@Override
+	public void removeAllComponents() {
+		componentMap.clear();
+	}
+
 	private void changeComponentLocale(T component) {
 		String[] codeArray = componentMap.get(component);
 

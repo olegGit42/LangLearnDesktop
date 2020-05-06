@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
 
 	public void init() {
 		MainLocaleManager.addTrackedItem(this, "app_name");
-		final String imgPath = "colibri_icon.png";
+		final String imgPath = "images/colibri_icon.png";
 		this.setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getClassLoader().getResource(imgPath)));
 
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

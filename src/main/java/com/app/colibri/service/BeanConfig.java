@@ -21,8 +21,9 @@ public class BeanConfig {
 
 	@Bean
 	@Qualifier(value = "defaultUser")
+	@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public User defaultUser() {
-		return new User("guest", Password.hashPassword("guest"));
+		return new User(User.GUEST, Password.hashPassword(User.GUEST));
 	}
 
 }

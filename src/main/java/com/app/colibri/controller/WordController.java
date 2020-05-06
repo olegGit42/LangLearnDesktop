@@ -20,8 +20,6 @@ import com.app.colibri.service.crypt.CryptoUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WordController {
-	private static int maxId;
-
 	public static List<Word> allWordsList;
 	public static final AtomicInteger newId = new AtomicInteger();
 	public static final String[] repeatPeriodArray;
@@ -72,93 +70,97 @@ public class WordController {
 	}
 
 	public static void unserializeAllWordsMain() {
-		unserializeAllWordsFromFile("words.json"); // main
-		// unserializeAllWordsFromFile("words.bin"); // for compatibility
+		unserializeAllWordsFromFile("UserData/" + AppSettings.appSettings.getUser().getUserName() + "/Data.encrypted");
 	}
 
 	public static void serializeAllWordsMain() {
-		serializeAllWordsToFile("words.json"); // main
-		// serializeAllWordsToFile("words.bin"); // for compatibility
+		serializeAllWordsToFile(AppSettings.appSettings.getUser().getUserName());
 	}
 
 	private static void unserializeAllWordsFromFile(String path) {
 		userDataRegistry = AppRun.appContext.getBean("userDataRegistry", UserDataRegistry.class);
 
-		if (path.endsWith(".json")) {
+		if (path.endsWith(".encrypted")) {
 			ObjectMapper mapper = new ObjectMapper();
 
-			// JSON file to Java object
 			try {
-				userDataRegistry = mapper.readValue(new File(path), UserDataRegistry.class);
-				// begin for compatibility
-				User user = AppSettings.appSettings.getUser();
-				userDataRegistry.setUserName(user.getUserName());
-				userDataRegistry.setUserPasswordHash(user.getUserPasswordHash());
-				userDataRegistry.setAutoEnter(user.isAutoEnter());
-				// end for compatibility
+				String jsonData = CryptoUtils.decrypt(AppSettings.KEY, new File(path));
+				UserDataRegistry userDataRegistryForCheck = mapper.readValue(jsonData, UserDataRegistry.class);
 
-				userDataRegistry.getTagRegistry().restoreTagIdMap();
-				AppSettings.appSettings.setAppLocale(Locale.forLanguageTag(userDataRegistry.getAppLocale()));
+				User user = AppSettings.appSettings.getUser();
+				if (user.getUserName().equals(userDataRegistryForCheck.getUserName())
+						&& (user.getUserPasswordHash().equals(userDataRegistryForCheck.getUserPasswordHash())
+								|| userDataRegistryForCheck.getUserName().equals(User.GUEST))) {
+
+					userDataRegistry = userDataRegistryForCheck;
+					userDataRegistry.getTagRegistry().restoreTagIdMap();
+					AppSettings.appSettings.setAppLocale(Locale.forLanguageTag(userDataRegistry.getAppLocale()));
+
+				} else {
+					AppSettings.appSettings.setUser(AppRun.appContext.getBean("defaultUser", User.class));
+				}
+
 			} catch (Exception e) {
 				System.err.println("File " + path + " not found");
 			}
 		}
 
 		allWordsList = userDataRegistry.getAllUserWordsList();
-
-		maxId = 0;
-
-		allWordsList.forEach(word -> {
-			maxId = word.getId() > maxId ? word.getId() : maxId;
-			setMinRepTime(word);
-		});
-
-		newId.set(maxId);
-		userDataRegistry.setMaxWordID(maxId); // for compatibility
+		allWordsList.forEach(WordController::setMinRepTime);
+		newId.set(userDataRegistry.getMaxWordID());
 	}
 
-	private static void serializeAllWordsToFile(String path) {
-		if (path.endsWith(".json")) {
-			ObjectMapper mapper = new ObjectMapper();
+	private static void serializeAllWordsToFile(String userName) {
 
-			// Java object to JSON file
-			try {
-				userDataRegistry.setMaxWordID(newId.get());
+		ObjectMapper mapper = new ObjectMapper();
 
-				File dataFile = new File(path);
-				mapper.writeValue(dataFile, userDataRegistry);
+		try {
+			// for dev branch, comment out line below on release
+			// mapper.writeValue(new File("Data.json"), userDataRegistry);
 
-				String currentUserDataDirPath = "UserData/" + AppSettings.appSettings.getUser().getUserName();
+			String currentUserDataDirPath = "UserData/" + userName;
 
-				File curentUserDataDir = new File(currentUserDataDirPath);
-				if (!curentUserDataDir.isDirectory()) {
-					curentUserDataDir.mkdir();
-				}
-
-				File dataEncryptedFile = new File(currentUserDataDirPath + "/Data.encrypted");
-				File userEncryptedFile = new File(currentUserDataDirPath + "/User.encrypted");
-				File autoEnterUserEncryptedFile = new File("User.encrypted");
-
-				User currentUser = AppSettings.appSettings.getUser();
-				String jsonUser = mapper.writeValueAsString(currentUser);
-				String jsonData = mapper.writeValueAsString(userDataRegistry);
-
-				try {
-					CryptoUtils.encrypt(AppSettings.KEY, jsonData, dataEncryptedFile);
-					CryptoUtils.encrypt(AppSettings.KEY, jsonUser, userEncryptedFile);
-					if (currentUser.isAutoEnter()) {
-						CryptoUtils.encrypt(AppSettings.KEY, jsonUser, autoEnterUserEncryptedFile);
-					} else if (autoEnterUserEncryptedFile.exists()) {
-						autoEnterUserEncryptedFile.delete();
-					}
-				} catch (CryptoException ex) {
-					System.err.println(ex.getMessage());
-					ex.printStackTrace();
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
+			File curentUserDataDir = new File(currentUserDataDirPath);
+			if (!curentUserDataDir.isDirectory()) {
+				curentUserDataDir.mkdir();
 			}
+
+			File dataEncryptedFile = new File(currentUserDataDirPath + "/Data.encrypted");
+			File userEncryptedFile = new File(currentUserDataDirPath + "/User.encrypted");
+			File autoEnterUserEncryptedFile = new File("User.encrypted");
+
+			User currentUser = AppSettings.appSettings.getUser();
+			if (currentUser.getUserName().equals(User.GUEST)) {
+				currentUser.setAutoEnter(true);
+			}
+
+			userDataRegistry.setMaxWordID(newId.get());
+			userDataRegistry.setUserName(currentUser.getUserName());
+			userDataRegistry.setUserPasswordHash(currentUser.getUserPasswordHash());
+			userDataRegistry.setAutoEnter(currentUser.isAutoEnter());
+
+			currentUser.setAutoEnter(false);
+			String jsonUser = mapper.writeValueAsString(currentUser);
+			currentUser.setAutoEnter(userDataRegistry.isAutoEnter());
+			String jsonAutoEnterUser = mapper.writeValueAsString(currentUser);
+
+			String jsonData = mapper.writeValueAsString(userDataRegistry);
+
+			try {
+				CryptoUtils.encrypt(AppSettings.KEY, jsonData, dataEncryptedFile);
+				CryptoUtils.encrypt(AppSettings.KEY, jsonUser, userEncryptedFile);
+				if (currentUser.isAutoEnter()) {
+					CryptoUtils.encrypt(AppSettings.KEY, jsonAutoEnterUser, autoEnterUserEncryptedFile);
+				} else if (autoEnterUserEncryptedFile.exists()) {
+					autoEnterUserEncryptedFile.delete();
+				}
+			} catch (CryptoException ex) {
+				System.err.println(ex.getMessage());
+				ex.printStackTrace();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}

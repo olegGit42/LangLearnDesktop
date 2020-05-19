@@ -1,7 +1,11 @@
 package com.app.colibri.view;
 
-import static com.app.colibri.service.AppSettings.getLocaledItem;
+import static com.app.colibri.service.AppSettings.jsonMapper;
 import static com.app.colibri.service.MainLocaleManager.addTrackedItem;
+import static com.app.colibri.view.util.ViewUtil.askCode;
+import static com.app.colibri.view.util.ViewUtil.msgErrorCode;
+import static com.app.colibri.view.util.ViewUtil.msgInfoCode;
+import static com.app.colibri.view.util.ViewUtil.msgWarningCode;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,7 +30,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -34,9 +37,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import com.app.colibri.controller.GUIController;
+import com.app.colibri.controller.RESTController;
 import com.app.colibri.controller.WordController;
 import com.app.colibri.model.Box;
 import com.app.colibri.model.User;
+import com.app.colibri.registry.UserDataRegistry;
 import com.app.colibri.service.AppRun;
 import com.app.colibri.service.AppSettings;
 import com.app.colibri.service.MainLocaleManager;
@@ -45,7 +50,6 @@ import com.app.colibri.service.crypt.CryptoUtils;
 import com.app.colibri.service.crypt.Password;
 import com.app.colibri.view.listeners.TextFieldClipboardMouseAdapter;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
 
@@ -69,6 +73,7 @@ public class LoginFrame {
 	private JLabel lblLocale;
 	private JCheckBox chbAutoLogIn;
 	private JCheckBox chbPwState;
+	private JCheckBox chbWeb;
 
 	/**
 	 * Launch the application.
@@ -149,9 +154,8 @@ public class LoginFrame {
 				if (state == State.REGISTER) {
 					final String newUsername = tfLogin.getText();
 
-					if (!checkLoginPassConstraints(newUsername, 0)) {
-						JOptionPane.showMessageDialog(null, getLocaledItem("username_constraint"), getLocaledItem("Warning"),
-								JOptionPane.WARNING_MESSAGE);
+					if (!checkLoginConstraints(newUsername, 0)) {
+						msgWarningCode("username_constraint");
 						tfLogin.setText(newUsernameBuffer);
 					} else {
 						newUsernameBuffer = newUsername;
@@ -191,9 +195,8 @@ public class LoginFrame {
 				if (state == State.REGISTER) {
 					final String newPassword = new String(pfPassword.getPassword());
 
-					if (!checkLoginPassConstraints(newPassword, 0)) {
-						JOptionPane.showMessageDialog(null, getLocaledItem("pass_constraint"), getLocaledItem("Warning"),
-								JOptionPane.WARNING_MESSAGE);
+					if (!checkPassConstraints(newPassword, 0)) {
+						msgWarningCode("pass_constraint");
 						pfPassword.setText(newUserPasswordBuffer);
 					} else {
 						newUserPasswordBuffer = newPassword;
@@ -230,7 +233,6 @@ public class LoginFrame {
 		lblRegister.setHorizontalAlignment(SwingConstants.RIGHT);
 		addTrackedItem(lblRegister, "Register");
 		lblRegister.setBounds(42, 104, 77, 14);
-		lblRegister.setToolTipText("");
 		lblRegister.setForeground(Color.GRAY);
 		lblRegister.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		pnlMain.add(lblRegister);
@@ -243,7 +245,6 @@ public class LoginFrame {
 				final String newPassword = new String(pfPassword.getPassword());
 
 				File userFile = new File("UserData/" + newUsername + "/User.encrypted");
-				ObjectMapper mapper = new ObjectMapper();
 
 				if (state == State.LOGIN) {
 
@@ -253,7 +254,7 @@ public class LoginFrame {
 
 						try {
 							String jsonUser = CryptoUtils.decrypt(AppSettings.KEY, userFile);
-							user = mapper.readValue(jsonUser, User.class);
+							user = jsonMapper.readValue(jsonUser, User.class);
 						} catch (IOException | CryptoException ex) {
 							ex.printStackTrace();
 						}
@@ -261,81 +262,111 @@ public class LoginFrame {
 						if (user.getUserName().equals(newUsername)
 								&& Password.checkPassword(newPassword, user.getUserPasswordHash())) {
 
+							if (chbWeb.isSelected()) {
+
+								if (RESTController.checkConnection()) {
+
+									int code = RESTController.login(user, newPassword);
+
+									if (code == 406) {
+										msgWarningCode("wrong_web_user_password");
+										return;
+									} else if (code == 404) {
+										msgWarningCode("web_user_not_found");
+										return;
+									} else if (code == 400) {
+										msgErrorCode("web_user_login_fail");
+										return;
+									}
+
+								} else {
+									msgWarningCode("web_connention_error");
+									return;
+								}
+
+							} else {
+								user.setId(0);
+								user.setAuthorizationToken(null);
+							}
+
+							WordController.serializeUserDataRegistryWithBackup();
+
 							user.setAutoEnter(chbAutoLogIn.isSelected());
 							AppSettings.appSettings.setUser(user);
 
-							// Close mainFrame for reload it
-							if (GUI.mainFrame != null) {
-								GUI.mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-								GUI.mainFrame.dispose();
-								GUI.mainFrame = null;
-							}
+							AppSettings.reloadMainFrame();
 
-							MainLocaleManager.removeAllItems();
-							WordController.minRepeatTime = Long.MAX_VALUE;
-							LoginFrame.appInit();
 							frame.dispose();
 
 						} else {
-							JOptionPane.showMessageDialog(null, getLocaledItem("worong_name_or_pass"), getLocaledItem("Warning"),
-									JOptionPane.WARNING_MESSAGE);
+							msgWarningCode("worong_name_or_pass");
 							return;
 						}
 
 					} else {
-						JOptionPane.showMessageDialog(null, getLocaledItem("user_not_found"), getLocaledItem("Warning"),
-								JOptionPane.WARNING_MESSAGE);
+						msgWarningCode("user_not_found");
 						return;
 					}
-
-				} else {
+					// TODO register
+				} else if (state == State.REGISTER) {
 
 					if (userFile.exists()) {
-						JOptionPane.showMessageDialog(null, getLocaledItem("user_exists"), getLocaledItem("Warning"),
-								JOptionPane.WARNING_MESSAGE);
+						msgWarningCode("user_exists");
 						return;
-					} else if (!checkLoginPassConstraints(newUsername)) {
-						JOptionPane.showMessageDialog(null, getLocaledItem("username_constraint"), getLocaledItem("Warning"),
-								JOptionPane.WARNING_MESSAGE);
+					} else if (!checkLoginConstraints(newUsername, 4)) {
+						msgWarningCode("username_constraint");
 						return;
-					} else if (!checkLoginPassConstraints(newPassword)) {
-						JOptionPane.showMessageDialog(null, getLocaledItem("pass_constraint"), getLocaledItem("Warning"),
-								JOptionPane.WARNING_MESSAGE);
+					} else if (!checkPassConstraints(newPassword, 4)) {
+						msgWarningCode("pass_constraint");
 						return;
 					} else {
 
 						User newUser = AppRun.appContext.getBean("user", User.class);
 						newUser.setUserName(newUsername);
+
+						if (chbWeb.isSelected()) {
+							if (RESTController.checkConnection()) {
+								newUser.setUserPasswordHash(Password.hashPassword(newPassword));
+								int responseCode = RESTController.register(newUser);
+
+								if (responseCode == 409) {
+									msgWarningCode("web_user_exist");
+									return;
+								} else if (responseCode != 201) {
+									msgErrorCode("web_user_reg_fail");
+									return;
+								}
+
+							} else {
+								msgWarningCode("web_connention_error");
+								return;
+							}
+						}
+
 						newUser.setUserPasswordHash(Password.hashPassword(newPassword));
 
 						try {
 							File userFileDir = new File("UserData/" + newUsername);
 							userFileDir.mkdir();
 
-							String jsonNewUser = mapper.writeValueAsString(newUser);
+							String jsonNewUser = jsonMapper.writeValueAsString(newUser);
 							CryptoUtils.encrypt(AppSettings.KEY, jsonNewUser, userFile);
 
 							if (GUI.mainFrame != null && WordController.allWordsList != null
 									&& WordController.allWordsList.size() > 0) {
-								final int answer = JOptionPane.showConfirmDialog(null,
-										getLocaledItem("ask_copy_words_to_new_user"), getLocaledItem("Question"),
-										JOptionPane.YES_NO_OPTION);
-
-								if (answer == JOptionPane.YES_OPTION) {
+								if (askCode("ask_copy_words_to_new_user")) {
 									User currentUser = AppSettings.appSettings.getUser();
 									AppSettings.appSettings.setUser(newUser);
-									WordController.serializeAllWordsMain();
+									WordController.serializeUserDataRegistry();
 									AppSettings.appSettings.setUser(currentUser);
 								}
 							}
 
 							changeState();
-							JOptionPane.showMessageDialog(null, getLocaledItem("Registration success"), getLocaledItem("Info"),
-									JOptionPane.INFORMATION_MESSAGE);
+							msgInfoCode("Registration success");
 						} catch (CryptoException | JsonProcessingException ex) {
 							ex.printStackTrace();
-							JOptionPane.showMessageDialog(null, getLocaledItem("Registration error"), getLocaledItem("Error"),
-									JOptionPane.ERROR_MESSAGE);
+							msgErrorCode("Registration error");
 						}
 					}
 
@@ -374,16 +405,22 @@ public class LoginFrame {
 		chbPwState.setBounds(42, 72, 77, 24);
 		pnlMain.add(chbPwState);
 
+		chbWeb = new JCheckBox("Web");
+		addTrackedItem(chbWeb, "Web", "Web", "chb_web_hint_login", "chb_web_hint_login");
+		chbWeb.setBounds(144, 100, 54, 23);
+		pnlMain.add(chbWeb);
+
 		MainLocaleManager.changeLocaleStatic();
 	}
 
-	private boolean checkLoginPassConstraints(String loginOrPass) {
-		return checkLoginPassConstraints(loginOrPass, 3);
+	private boolean checkLoginConstraints(String login, int min) {
+		Pattern p = Pattern.compile("^[0-9a-zA-Zа-яА-ЯёЁ]{" + min + ",60}$");
+		return (p.matcher(login).find() && (!login.equals("guest")));
 	}
 
-	private boolean checkLoginPassConstraints(String loginOrPass, int min) {
-		Pattern p = Pattern.compile("^[0-9a-zA-Zа-яА-ЯёЁ]{" + min + ",16}$");
-		return p.matcher(loginOrPass).find();
+	private boolean checkPassConstraints(String pass, int min) {
+		Pattern p = Pattern.compile("^[\\S]{" + min + ",72}$");
+		return p.matcher(pass).find();
 	}
 
 	private void changeTitle() {
@@ -405,10 +442,12 @@ public class LoginFrame {
 			state = State.REGISTER;
 			btnText = "Register";
 			lblText = "Log in";
+			addTrackedItem(chbWeb, "Web", "Web", "chb_web_hint", "chb_web_hint");
 		} else {
 			state = State.LOGIN;
 			btnText = "Log in";
 			lblText = "Register";
+			addTrackedItem(chbWeb, "Web", "Web", "chb_web_hint_login", "chb_web_hint_login");
 		}
 
 		addTrackedItem(btnLogin, btnText);
@@ -419,7 +458,11 @@ public class LoginFrame {
 	}
 
 	public static void appInit() {
-		WordController.unserializeAllWordsMain();
+		appInit(WordController.unserializeUserDataRegistry());
+	}
+
+	public static void appInit(UserDataRegistry userDataRegistry) {
+		WordController.loadUserData(userDataRegistry);
 		Box.refreshBox();
 		SwingUtilities.invokeLater(GUI::new);
 	}

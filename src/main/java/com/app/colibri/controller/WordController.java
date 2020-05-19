@@ -1,10 +1,13 @@
 package com.app.colibri.controller;
 
 import static com.app.colibri.service.AppSettings.getLocaledItem;
+import static com.app.colibri.service.AppSettings.jsonMapper;
 
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -17,11 +20,10 @@ import com.app.colibri.service.AppRun;
 import com.app.colibri.service.AppSettings;
 import com.app.colibri.service.crypt.CryptoException;
 import com.app.colibri.service.crypt.CryptoUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WordController {
 	public static List<Word> allWordsList;
-	public static final AtomicInteger newId = new AtomicInteger();
+	public static final AtomicInteger maxWordId = new AtomicInteger();
 	public static final String[] repeatPeriodArray;
 	public static final long[] timeDeltaArray;
 	public static final String[] boxPeriod;
@@ -69,23 +71,23 @@ public class WordController {
 		}
 	}
 
-	public static void unserializeAllWordsMain() {
-		unserializeAllWordsFromFile("UserData/" + AppSettings.appSettings.getUser().getUserName() + "/Data.encrypted");
+	public static void serializeUserDataRegistry() {
+		serializeUserDataRegistry(false);
 	}
 
-	public static void serializeAllWordsMain() {
-		serializeAllWordsToFile(AppSettings.appSettings.getUser().getUserName());
+	public static void serializeUserDataRegistryWithBackup() {
+		serializeUserDataRegistry(true);
 	}
 
-	private static void unserializeAllWordsFromFile(String path) {
-		userDataRegistry = AppRun.appContext.getBean("userDataRegistry", UserDataRegistry.class);
+	public static UserDataRegistry unserializeUserDataRegistry() {
+		final String path = "UserData/" + AppSettings.appSettings.getUser().getUserName() + "/Data.encrypted";
+
+		UserDataRegistry userDataRegistry = AppRun.appContext.getBean("userDataRegistry", UserDataRegistry.class);
 
 		if (path.endsWith(".encrypted")) {
-			ObjectMapper mapper = new ObjectMapper();
-
 			try {
 				String jsonData = CryptoUtils.decrypt(AppSettings.KEY, new File(path));
-				UserDataRegistry userDataRegistryForCheck = mapper.readValue(jsonData, UserDataRegistry.class);
+				UserDataRegistry userDataRegistryForCheck = jsonMapper.readValue(jsonData, UserDataRegistry.class);
 
 				User user = AppSettings.appSettings.getUser();
 				if (user.getUserName().equals(userDataRegistryForCheck.getUserName())
@@ -105,20 +107,21 @@ public class WordController {
 			}
 		}
 
-		allWordsList = userDataRegistry.getAllUserWordsList();
-		allWordsList.forEach(WordController::setMinRepTime);
-		newId.set(userDataRegistry.getMaxWordID());
+		return userDataRegistry;
 	}
 
-	private static void serializeAllWordsToFile(String userName) {
+	public static void loadUserData(UserDataRegistry p_userDataRegistry) {
+		userDataRegistry = p_userDataRegistry;
+		allWordsList = userDataRegistry.getAllUserWordsList();
+		allWordsList.forEach(WordController::setMinRepTime);
+		maxWordId.set(userDataRegistry.getMaxWordID());
+	}
 
-		ObjectMapper mapper = new ObjectMapper();
-
+	private static void serializeUserDataRegistry(boolean backup) {
 		try {
-			// for dev branch, comment out line below on release
-			// mapper.writeValue(new File("Data.json"), userDataRegistry);
+			User currentUser = AppSettings.appSettings.getUser();
 
-			String currentUserDataDirPath = "UserData/" + userName;
+			String currentUserDataDirPath = "UserData/" + currentUser.getUserName();
 
 			File curentUserDataDir = new File(currentUserDataDirPath);
 			if (!curentUserDataDir.isDirectory()) {
@@ -129,31 +132,58 @@ public class WordController {
 			File userEncryptedFile = new File(currentUserDataDirPath + "/User.encrypted");
 			File autoEnterUserEncryptedFile = new File("User.encrypted");
 
-			User currentUser = AppSettings.appSettings.getUser();
 			if (currentUser.getUserName().equals(User.GUEST)) {
 				currentUser.setAutoEnter(true);
 			}
 
-			userDataRegistry.setMaxWordID(newId.get());
+			userDataRegistry.setMaxWordID(maxWordId.get());
 			userDataRegistry.setUserName(currentUser.getUserName());
 			userDataRegistry.setUserPasswordHash(currentUser.getUserPasswordHash());
 			userDataRegistry.setAutoEnter(currentUser.isAutoEnter());
+			userDataRegistry.setUserId(currentUser.getId());
 
 			currentUser.setAutoEnter(false);
-			String jsonUser = mapper.writeValueAsString(currentUser);
+			String jsonUser = jsonMapper.writeValueAsString(currentUser);
 			currentUser.setAutoEnter(userDataRegistry.isAutoEnter());
-			String jsonAutoEnterUser = mapper.writeValueAsString(currentUser);
+			String jsonAutoEnterUser = jsonMapper.writeValueAsString(currentUser);
 
-			String jsonData = mapper.writeValueAsString(userDataRegistry);
+			String jsonData = jsonMapper.writeValueAsString(userDataRegistry);
+
+			// for dev branch, comment out two lines below on release
+			// mapper.writeValue(new File("Data.json"), userDataRegistry);
+			// mapper.writeValue(new File("User.json"), currentUser);
 
 			try {
 				CryptoUtils.encrypt(AppSettings.KEY, jsonData, dataEncryptedFile);
 				CryptoUtils.encrypt(AppSettings.KEY, jsonUser, userEncryptedFile);
-				if (currentUser.isAutoEnter()) {
+
+				if (currentUser.isAutoEnter())
 					CryptoUtils.encrypt(AppSettings.KEY, jsonAutoEnterUser, autoEnterUserEncryptedFile);
-				} else if (autoEnterUserEncryptedFile.exists()) {
+				else if (autoEnterUserEncryptedFile.exists())
 					autoEnterUserEncryptedFile.delete();
+
+				if (backup) {
+					String currentUserDataDirBackupPath = currentUserDataDirPath + "/Backup";
+
+					File curentUserDataDirBackup = new File(currentUserDataDirBackupPath);
+					if (!curentUserDataDirBackup.isDirectory()) {
+						curentUserDataDirBackup.mkdir();
+					}
+
+					Arrays.asList(curentUserDataDirBackup.listFiles()).stream().sorted(Comparator.reverseOrder()).skip(8)
+							.forEach(File::delete);
+
+					Date date = new Date(System.currentTimeMillis());
+					DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+					final String dateTime = dateFormat.format(date);
+
+					File dataEncryptedFileBackup = new File(currentUserDataDirBackupPath + "/" + dateTime + "-Data.encrypted");
+					File userEncryptedFileBackup = new File(currentUserDataDirBackupPath + "/" + dateTime + "-User.encrypted");
+
+					CryptoUtils.encrypt(AppSettings.KEY, jsonData, dataEncryptedFileBackup);
+					CryptoUtils.encrypt(AppSettings.KEY, jsonUser, userEncryptedFileBackup);
 				}
+
 			} catch (CryptoException ex) {
 				System.err.println(ex.getMessage());
 				ex.printStackTrace();

@@ -13,6 +13,8 @@ public class User implements Serializable {
 
 	public static final String GUEST = "guest";
 
+	private int id;
+	private String authorizationToken;
 	private String userName;
 	private String userPasswordHash;
 	private boolean autoEnter = false;

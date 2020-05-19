@@ -3,6 +3,11 @@ package com.app.colibri.view;
 import static com.app.colibri.controller.WordController.getBoxInfo;
 import static com.app.colibri.service.AppSettings.getLocaledItem;
 import static com.app.colibri.service.MainLocaleManager.addTrackedItem;
+import static com.app.colibri.view.util.ViewUtil.askCode;
+import static com.app.colibri.view.util.ViewUtil.msgBase;
+import static com.app.colibri.view.util.ViewUtil.msgErrorCode;
+import static com.app.colibri.view.util.ViewUtil.msgInfoCode;
+import static com.app.colibri.view.util.ViewUtil.msgWarningCode;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,15 +45,16 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import com.app.colibri.controller.GUIController;
+import com.app.colibri.controller.RESTController;
 import com.app.colibri.controller.WordController;
 import com.app.colibri.model.Box;
 import com.app.colibri.model.Word;
 import com.app.colibri.model.tablemodel.AllWordsTableModel;
 import com.app.colibri.model.tablemodel.BoxesTableModel;
 import com.app.colibri.model.tablemodel.RepeateTableModel;
+import com.app.colibri.registry.UserDataRegistry;
 import com.app.colibri.service.AppRun;
 import com.app.colibri.service.AppSettings;
 import com.app.colibri.service.MainLocaleManager;
@@ -76,7 +82,6 @@ public class GUI {
 		localeSwitchMap.put("RU", "EN");
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public GUI() {
 
 		// __________________________________________________________________________________________________________________________________
@@ -100,16 +105,68 @@ public class GUI {
 
 		// --------[Change user button begin]
 
-		JPanel pnlChangeUser = new JPanel();
+		final boolean isWebButtonVisible = (AppSettings.appSettings.getUser().getId() != 0);
+
+		JButton bSendToWeb = new JButton();
+		addTrackedItem(bSendToWeb, null, "bSendToWebHint");
+		bSendToWeb.setMargin(new Insets(2, 2, 2, 2));
+		bSendToWeb.setPreferredSize(new Dimension(34, 34));
+		bSendToWeb.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/upload25.png")));
+		bSendToWeb.setVisible(isWebButtonVisible);
+		bSendToWeb.addActionListener(e -> {
+			if (RESTController.checkConnection()) {
+				if (askCode("ask_send_to_web")) {
+					if (RESTController.sendUserData()) {
+						msgInfoCode("web_send_ok");
+					} else {
+						msgWarningCode("relogin_web");
+					}
+				}
+			} else {
+				msgWarningCode("web_connention_error");
+			}
+		});
+
+		JButton bLoadFromWeb = new JButton();
+		addTrackedItem(bLoadFromWeb, null, "bLoadFromWebHint");
+		bLoadFromWeb.setMargin(new Insets(2, 2, 2, 2));
+		bLoadFromWeb.setPreferredSize(new Dimension(34, 34));
+		bLoadFromWeb.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/download25.png")));
+		bLoadFromWeb.setVisible(isWebButtonVisible);
+		bLoadFromWeb.addActionListener(e -> {
+			if (RESTController.checkConnection()) {
+				if (askCode("ask_load_from_web")) {
+					UserDataRegistry webUserDataRegistry = RESTController.getUserData();
+
+					if (webUserDataRegistry != null) {
+						WordController.serializeUserDataRegistryWithBackup();
+						AppSettings.reloadMainFrame(webUserDataRegistry);
+						msgInfoCode("web_load_ok");
+						if (GUI.mainFrame != null) {
+							GUI.mainFrame.toFront();
+						}
+					} else {
+						msgWarningCode("relogin_web");
+					}
+				}
+			} else {
+				msgWarningCode("web_connention_error");
+			}
+		});
+
 		JButton btnChangeUser = new JButton();
 		addTrackedItem(btnChangeUser, null, "Change user");
 		btnChangeUser.setMargin(new Insets(2, 2, 2, 2));
 		btnChangeUser.setPreferredSize(new Dimension(34, 34));
 		btnChangeUser.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/change_user30.png")));
-		pnlChangeUser.add(btnChangeUser);
 		btnChangeUser.addActionListener(e -> {
 			LoginFrame.launch(LoginFrame.State.LOGIN);
 		});
+
+		JPanel pnlChangeUser = new JPanel();
+		pnlChangeUser.add(bSendToWeb);
+		pnlChangeUser.add(bLoadFromWeb);
+		pnlChangeUser.add(btnChangeUser);
 
 		// --------[Change user button end]
 
@@ -172,10 +229,9 @@ public class GUI {
 				if (check == 0) {
 					try {
 						WordController.createNewWordGUI(newWordStr, translateStr);
-						WordController.serializeAllWordsMain();
+						WordController.serializeUserDataRegistry();
 					} catch (Exception ex) {
-						JOptionPane.showMessageDialog(null, getLocaledItem("add_error"), getLocaledItem("Error"),
-								JOptionPane.ERROR_MESSAGE);
+						msgErrorCode("add_error");
 					}
 
 					translate.setText("");
@@ -183,8 +239,7 @@ public class GUI {
 				} else {
 					newWord.setText(newWord.getText().trim());
 					translate.setText(translate.getText().trim());
-					JOptionPane.showMessageDialog(null, getLocaledItem("already_added"), getLocaledItem("Error"),
-							JOptionPane.ERROR_MESSAGE);
+					msgErrorCode("already_added");
 				}
 
 			} else {
@@ -198,8 +253,7 @@ public class GUI {
 					recurenceTime = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new Date(WordController.minRepeatTime));
 				}
 
-				JOptionPane.showMessageDialog(null, recurenceTime, getLocaledItem("Repetition time"),
-						JOptionPane.INFORMATION_MESSAGE);
+				msgBase(recurenceTime, "Repetition time", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 
@@ -220,8 +274,8 @@ public class GUI {
 		JTable tableRepeate = new JTable(modelRepeate);
 		addTrackedItem(tableRepeate, null, "Word", "Period", "Box");
 		tableRepeate.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tableRepeate.setRowSorter(new TableRowSorter(modelRepeate));
-		tableRepeate.setAutoCreateRowSorter(true);
+		// tableRepeate.setRowSorter(new TableRowSorter(modelRepeate));
+		// tableRepeate.setAutoCreateRowSorter(true);
 
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -424,7 +478,7 @@ public class GUI {
 					newBoxText.setSelectedIndex(-1);
 
 					refreshRepeate.doClick();
-					WordController.serializeAllWordsMain();
+					WordController.serializeUserDataRegistry();
 					GUIController.updMinRepeatTime();
 				}
 			}

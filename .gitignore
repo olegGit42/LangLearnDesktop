@@ -10,3 +10,4 @@ bin/
 !Release/words.bin
 !Release/words.json
 !Release/Colibri.jar
+*Backup*

@@ -3,6 +3,10 @@ package com.app.colibri.view.panels;
 import static com.app.colibri.controller.WordController.getBoxInfo;
 import static com.app.colibri.service.AppSettings.getLocaledItem;
 import static com.app.colibri.service.MainLocaleManager.addTrackedItem;
+import static com.app.colibri.view.util.ViewUtil.askCode;
+import static com.app.colibri.view.util.ViewUtil.msgErrorCode;
+import static com.app.colibri.view.util.ViewUtil.msgInfoCode;
+import static com.app.colibri.view.util.ViewUtil.msgWarning;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -29,7 +33,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -149,24 +152,19 @@ public class EditPanel extends JPanel {
 							&& tfEditTranslate.getText().trim().equals(tfTranslate.getText())
 							&& tfBox.getText().equals(String.valueOf(comboBox.getSelectedItem()))
 							&& actualTagSet.equals(editedTagSet)) {
-						JOptionPane.showMessageDialog(null, getLocaledItem("No changes"), getLocaledItem("Info"),
-								JOptionPane.INFORMATION_MESSAGE);
+						msgInfoCode("No changes");
 						return;
 					}
 
 					for (Word word : WordController.allWordsList) {
 						if (tfEditWord.getText().trim().toLowerCase().equals(word.getWord().toLowerCase())
 								&& word != editedWord) {
-							JOptionPane.showMessageDialog(null, getLocaledItem("already_added"), getLocaledItem("Error"),
-									JOptionPane.ERROR_MESSAGE);
+							msgErrorCode("already_added");
 							return;
 						}
 					}
 
-					final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_edit"), getLocaledItem("Question"),
-							JOptionPane.YES_NO_OPTION);
-
-					if (answer == JOptionPane.YES_OPTION) {
+					if (askCode("ask_edit")) {
 						editedWord.setWord(tfEditWord.getText().trim());
 						editedWord.setTranslate(tfEditTranslate.getText().trim());
 						if (!tfBox.getText().equals(String.valueOf(comboBox.getSelectedItem()))) {
@@ -176,7 +174,7 @@ public class EditPanel extends JPanel {
 						if (!actualTagSet.equals(editedTagSet)) {
 							editedWord.putNewTagSet(editedTagSet);
 						}
-						WordController.serializeAllWordsMain();
+						WordController.serializeUserDataRegistry();
 
 						int selectedRowIndex = table.getSelectedRows()[0];
 						table.getSelectionModel().clearSelection();
@@ -195,14 +193,11 @@ public class EditPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				editState = EditState.DELETE;
 				if (isDefinedWord()) {
-					final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_del"), getLocaledItem("Question"),
-							JOptionPane.YES_NO_OPTION);
-
-					if (answer == JOptionPane.YES_OPTION) {
+					if (askCode("ask_del")) {
 						WordController.allWordsList.remove(editedWord);
 						searchWords();
 						GUIController.updMinRepeatTime();
-						WordController.serializeAllWordsMain();
+						WordController.serializeUserDataRegistry();
 					}
 				}
 			}
@@ -580,10 +575,7 @@ public class EditPanel extends JPanel {
 					comboBoxEditTag.removeItem(v_tag);
 
 				} else if (e.getButton() == MouseEvent.BUTTON3) {
-					final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_rem_wrd_tags"),
-							getLocaledItem("Question"), JOptionPane.YES_NO_OPTION);
-
-					if (answer == JOptionPane.YES_OPTION) {
+					if (askCode("ask_rem_wrd_tags")) {
 						editedTagSet.clear();
 						comboBoxEditTag.removeAllItems();
 					}
@@ -647,26 +639,18 @@ public class EditPanel extends JPanel {
 				String v_newTag = tfNewTag.getText() == null ? "" : tfNewTag.getText().toUpperCase().trim();
 
 				if (!WordController.userDataRegistry.getTagRegistry().getTagIdMap().containsKey(v_oldTag)) {
-					JOptionPane.showMessageDialog(null,
-							v_oldTag.equals("") ? getLocaledItem("choose_tag")
-									: getLocaledItem("Tag") + " \"" + v_oldTag + "\" " + getLocaledItem("not found"),
-							getLocaledItem("Warning"), JOptionPane.WARNING_MESSAGE);
+					msgWarning(v_oldTag.equals("") ? getLocaledItem("choose_tag")
+							: getLocaledItem("Tag") + " \"" + v_oldTag + "\" " + getLocaledItem("not found"));
 					return;
 				} else if (v_newTag.equals("")) {
-					JOptionPane.showMessageDialog(null, getLocaledItem("empty_tag_value"), getLocaledItem("Error"),
-							JOptionPane.ERROR_MESSAGE);
+					msgErrorCode("empty_tag_value");
 					return;
 				} else if (WordController.userDataRegistry.getTagRegistry().getTagIdMap().containsKey(v_newTag)) {
-					JOptionPane.showMessageDialog(null,
-							getLocaledItem("Tag") + " \"" + v_newTag + "\" " + getLocaledItem("already exists"),
-							getLocaledItem("Warning"), JOptionPane.WARNING_MESSAGE);
+					msgWarning(getLocaledItem("Tag") + " \"" + v_newTag + "\" " + getLocaledItem("already exists"));
 					return;
 				}
 
-				final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_replace_tag"),
-						getLocaledItem("Question"), JOptionPane.YES_NO_OPTION);
-
-				if (answer == JOptionPane.YES_OPTION) {
+				if (askCode("ask_replace_tag")) {
 					WordController.userDataRegistry.getTagRegistry().editTag(tfTag.getText(), tfNewTag.getText());
 				}
 			}
@@ -679,10 +663,7 @@ public class EditPanel extends JPanel {
 		addTrackedItem(bRemoveUnusedTags, "rem_unuse_tags");
 		bRemoveUnusedTags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				final int answer = JOptionPane.showConfirmDialog(null, getLocaledItem("ask_rem_unuse_tags"),
-						getLocaledItem("Question"), JOptionPane.YES_NO_OPTION);
-
-				if (answer == JOptionPane.YES_OPTION) {
+				if (askCode("ask_rem_unuse_tags")) {
 					WordController.userDataRegistry.getTagRegistry().removeAllTags();
 				}
 			}
@@ -740,7 +721,7 @@ public class EditPanel extends JPanel {
 					searchWords();
 				} else if (e.getButton() == MouseEvent.BUTTON2) {
 					if (e.getClickCount() > 1) {
-						tfFindWord.setText(new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())));
+						tfFindWord.setText(new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis())) + "r");
 					}
 					searchWords();
 				}
@@ -915,8 +896,7 @@ public class EditPanel extends JPanel {
 								|| (!tfEditWord.getText().trim().equals("") && !tfEditTranslate.getText().trim().equals("")));
 
 		if (!isDefined) {
-			JOptionPane.showMessageDialog(null, getLocaledItem("Undefined word"), getLocaledItem("Error"),
-					JOptionPane.ERROR_MESSAGE);
+			msgErrorCode("Undefined word");
 		}
 
 		editState = EditState.READ;

@@ -24,6 +24,7 @@ public class UserDataRegistry implements Serializable {
 	@Autowired
 	private TagRegistry tagRegistry;
 	private String appLocale = "EN";
+	private int userId = 0;
 	private String userName = User.GUEST;
 	private String userPasswordHash = Password.hashPassword(User.GUEST);
 	private boolean autoEnter = false;

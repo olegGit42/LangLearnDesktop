@@ -11,7 +11,7 @@ public class MainFrameListener implements WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent event) {
-		WordController.serializeAllWordsMain();
+		WordController.serializeUserDataRegistryWithBackup();
 		System.exit(0);
 	}
 

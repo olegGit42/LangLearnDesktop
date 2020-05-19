@@ -30,7 +30,7 @@ public class Word implements Serializable {
 		final long time = System.currentTimeMillis();
 		this.regTime = time;
 		this.creationTime = time;
-		this.id = WordController.newId.incrementAndGet();
+		this.id = WordController.maxWordId.incrementAndGet();
 		this.word = word;
 		this.translate = translate;
 		Box.getBox(0).add(this);

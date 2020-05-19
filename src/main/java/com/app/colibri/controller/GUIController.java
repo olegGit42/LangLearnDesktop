@@ -34,7 +34,8 @@ public class GUIController {
 	public static void badRememberWords(final List<Word> badRememberWordList) {
 		badRememberWordList.clear();
 		allWordsList.stream().filter(word -> word.getRepeateIndicator() > 3 && word.getBox() < 4)
-				.sorted(Comparator.comparingInt(Word::getRepeateIndicator).reversed()).forEach(badRememberWordList::add);
+				.sorted(Comparator.comparingInt(Word::getRepeateIndicator).reversed()).limit(30)
+				.forEach(badRememberWordList::add);
 	}
 
 	public static void searchWords(final List<Word> serachWordList, final String str, final boolean isTranslate,

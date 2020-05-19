@@ -6,6 +6,7 @@ bin/
 *.rar
 *.bin
 *.json
+*.encrypted
 !.gitignore
 !Release/words.bin
 !Release/words.json

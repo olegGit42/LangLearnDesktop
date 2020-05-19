@@ -10,4 +10,5 @@ bin/
 !Release/words.bin
 !Release/words.json
 !Release/Colibri.jar
+dependency-reduced-pom.xml
 *Backup*

@@ -95,7 +95,6 @@ public class WordController {
 								|| userDataRegistryForCheck.getUserName().equals(User.GUEST))) {
 
 					userDataRegistry = userDataRegistryForCheck;
-					userDataRegistry.getTagRegistry().restoreTagIdMap();
 					AppSettings.appSettings.setAppLocale(Locale.forLanguageTag(userDataRegistry.getAppLocale()));
 
 				} else {
@@ -112,6 +111,9 @@ public class WordController {
 
 	public static void loadUserData(UserDataRegistry p_userDataRegistry) {
 		userDataRegistry = p_userDataRegistry;
+		userDataRegistry.getTagRegistry().restoreTagIdMap();
+		userDataRegistry.setAppLocale(AppSettings.appSettings.getAppLocale().toLanguageTag());
+		userDataRegistry.setUserId(AppSettings.appSettings.getUser().getId());
 		allWordsList = userDataRegistry.getAllUserWordsList();
 		allWordsList.forEach(WordController::setMinRepTime);
 		maxWordId.set(userDataRegistry.getMaxWordID());

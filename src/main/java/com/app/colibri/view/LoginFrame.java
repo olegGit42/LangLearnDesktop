@@ -415,7 +415,7 @@ public class LoginFrame {
 
 	private boolean checkLoginConstraints(String login, int min) {
 		Pattern p = Pattern.compile("^[0-9a-zA-Zа-яА-ЯёЁ]{" + min + ",60}$");
-		return (p.matcher(login).find() && (!login.equals("guest")));
+		return (p.matcher(login).find() && (!login.equalsIgnoreCase("guest")));
 	}
 
 	private boolean checkPassConstraints(String pass, int min) {

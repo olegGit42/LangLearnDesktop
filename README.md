@@ -7,6 +7,9 @@ Web part for ColibriDesktop
 # [RELEASE](https://wordkeeper.herokuapp.com)
 https://wordkeeper.herokuapp.com
 
+## v1.0.2.0
+Some bugs fixed
+
 ## v1.0.1.9
 Web user support
 

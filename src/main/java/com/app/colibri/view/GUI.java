@@ -510,7 +510,7 @@ public class GUI {
 			public void valueChanged(ListSelectionEvent e) {
 				int[] selectedRows = tableRepeate.getSelectedRows();
 				try {
-					int selIndex = tableRepeate.getRowSorter().convertRowIndexToModel(selectedRows[0]);
+					int selIndex = selectedRows[0]; // tableRepeate.getRowSorter().convertRowIndexToModel(selectedRows[0]);
 					TableModel model = tableRepeate.getModel();
 					wordRepText.setText(String.valueOf(model.getValueAt(selIndex, 1)));
 					translateRepText.setText(null);

@@ -2,20 +2,9 @@ package com.app.colibri.service;
 
 import static com.app.colibri.service.AppSettings.jsonMapper;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -40,80 +29,7 @@ public class AppRun {
 	}
 
 	public static void main(String[] args) {
-		// testGet();
-		// testPost();
-
 		start();
-	}
-
-	public static void testPost() {
-
-		try {
-
-			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-			HttpPost postRequest = new HttpPost("http://localhost:8080/ColibriWeb/setstring");
-
-			String one = "один";
-
-			String jsonString = jsonMapper.writeValueAsString(new String[] { one, "two" });
-
-			System.out.println(jsonString);
-
-			StringEntity input = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
-			input.setContentType("application/json");
-			postRequest.setEntity(input);
-
-			HttpResponse response = httpClient.execute(postRequest);
-
-			if (response.getStatusLine().getStatusCode() != 201) {
-				// throw new RuntimeException("Failed : HTTP error code : " +
-				// response.getStatusLine().getStatusCode());
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-
-			String output;
-			System.out.println("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void testGet() {
-
-		try {
-
-			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-			HttpGet getRequest = new HttpGet("http://localhost:8080/ColibriWeb/getstring/testget");
-			getRequest.addHeader("accept", "application/json");
-
-			HttpResponse response = httpClient.execute(getRequest);
-
-			if (response.getStatusLine().getStatusCode() != 200) {
-				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-
-			String output;
-			System.out.println("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	public static void start() {

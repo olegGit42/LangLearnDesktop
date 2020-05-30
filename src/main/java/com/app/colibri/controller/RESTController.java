@@ -147,6 +147,25 @@ public class RESTController {
 		}
 	}
 
+	public static boolean checkUserAuth() {
+		try {
+			User user = AppSettings.appSettings.getUser();
+
+			String[] encryptedRequest = { String.valueOf(user.getId()),
+					CryptoUtils.encrypt(user.getAuthorizationToken(), jsonMapper.writeValueAsString(user)) };
+
+			String responseJson = postJson("checkuserauth", jsonMapper.writeValueAsString(encryptedRequest));
+
+			Integer[] responseArray = jsonMapper.readValue(responseJson, Integer[].class);
+
+			return (responseArray[0] == 200);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	public static String postJson(String urlAction, String json) {
 		try {
 			CloseableHttpClient httpClient = HttpClientBuilder.create().build();

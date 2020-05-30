@@ -7,6 +7,10 @@ Web part for ColibriDesktop
 # [RELEASE](https://wordkeeper.herokuapp.com)
 https://wordkeeper.herokuapp.com
 
+## v1.0.2.1
+Notification about web account save word  
+action when try save desktop app word
+
 ## v1.0.2.0
 Some bugs fixed
 

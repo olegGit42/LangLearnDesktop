@@ -114,17 +114,19 @@ public class GUI {
 		bSendToWeb.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/upload25.png")));
 		bSendToWeb.setVisible(isWebButtonVisible);
 		bSendToWeb.addActionListener(e -> {
-			if (RESTController.checkConnection()) {
-				if (askCode("ask_send_to_web")) {
-					if (RESTController.sendUserData()) {
-						msgInfoCode("web_send_ok");
-					} else {
-						msgWarningCode("relogin_web");
-					}
-				}
-			} else {
-				msgWarningCode("web_connention_error");
+
+			if (!GUIController.canWordAction()) {
+				return;
 			}
+
+			if (askCode("ask_send_to_web")) {
+				if (RESTController.sendUserData()) {
+					msgInfoCode("web_send_ok");
+				} else {
+					msgWarningCode("relogin_web");
+				}
+			}
+
 		});
 
 		JButton bLoadFromWeb = new JButton();
@@ -134,24 +136,26 @@ public class GUI {
 		bLoadFromWeb.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("images/download25.png")));
 		bLoadFromWeb.setVisible(isWebButtonVisible);
 		bLoadFromWeb.addActionListener(e -> {
-			if (RESTController.checkConnection()) {
-				if (askCode("ask_load_from_web")) {
-					UserDataRegistry webUserDataRegistry = RESTController.getUserData();
 
-					if (webUserDataRegistry != null) {
-						WordController.serializeUserDataRegistryWithBackup();
-						AppSettings.reloadMainFrame(webUserDataRegistry);
-						msgInfoCode("web_load_ok");
-						if (GUI.mainFrame != null) {
-							GUI.mainFrame.toFront();
-						}
-					} else {
-						msgWarningCode("relogin_web");
-					}
-				}
-			} else {
-				msgWarningCode("web_connention_error");
+			if (!GUIController.canWordAction()) {
+				return;
 			}
+
+			if (askCode("ask_load_from_web")) {
+				UserDataRegistry webUserDataRegistry = RESTController.getUserData();
+
+				if (webUserDataRegistry != null) {
+					WordController.serializeUserDataRegistryWithBackup();
+					AppSettings.reloadMainFrame(webUserDataRegistry);
+					msgInfoCode("web_load_ok");
+					if (GUI.mainFrame != null) {
+						GUI.mainFrame.toFront();
+					}
+				} else {
+					msgWarningCode("relogin_web");
+				}
+			}
+
 		});
 
 		JButton btnChangeUser = new JButton();
@@ -218,6 +222,11 @@ public class GUI {
 			String translateStr = translate.getText().trim();
 
 			if (!newWordStr.equals("") && !translateStr.equals("")) {
+
+				if (!GUIController.canWordAction()) {
+					return;
+				}
+
 				int check = 0;
 
 				for (int i = 0; i < WordController.allWordsList.size(); i++) {
@@ -237,14 +246,14 @@ public class GUI {
 					translate.setText("");
 					newWord.setText("");
 				} else {
-					newWord.setText(newWord.getText().trim());
-					translate.setText(translate.getText().trim());
+					newWord.setText(newWordStr);
+					translate.setText(translateStr);
 					msgErrorCode("already_added");
 				}
 
 			} else {
-				newWord.setText(newWord.getText().trim());
-				translate.setText(translate.getText().trim());
+				newWord.setText(newWordStr);
+				translate.setText(translateStr);
 
 				String recurenceTime;
 				if (WordController.minRepeatTime == Long.MAX_VALUE) {
@@ -444,6 +453,7 @@ public class GUI {
 					wordRepText.setText(String.valueOf(tableRepeate.getModel().getValueAt(0, 1)));
 				} catch (Exception ex) {
 				}
+				GUIController.updMinRepeatTime();
 			}
 		});
 
@@ -464,6 +474,11 @@ public class GUI {
 			public void actionPerformed(ActionEvent e) {
 				if (0 <= newBoxText.getSelectedIndex() && newBoxText.getSelectedIndex() <= 7
 						&& !translateRepText.getText().trim().equals("")) {
+
+					if (!GUIController.canWordAction()) {
+						return;
+					}
+
 					for (Word word : WordController.allWordsList) {
 						if (wordRepText.getText().trim().toLowerCase().equals(word.getWord().toLowerCase())) {
 							word.setNewBoxAndUpdDate(newBoxText.getSelectedIndex());
@@ -498,6 +513,11 @@ public class GUI {
 		bSaveZeroRep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!translateRepText.getText().trim().equals("")) {
+
+					if (!GUIController.canWordAction()) {
+						return;
+					}
+
 					newBoxText.setSelectedIndex(0);
 					bSaveRep.doClick();
 				}

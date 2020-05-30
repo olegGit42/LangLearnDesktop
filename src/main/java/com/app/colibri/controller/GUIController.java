@@ -4,6 +4,7 @@ import static com.app.colibri.controller.WordController.allWordsList;
 import static com.app.colibri.controller.WordController.getRoundedTimeToMinute;
 import static com.app.colibri.controller.WordController.getTimeDelta;
 import static com.app.colibri.service.AppSettings.getLocaledItem;
+import static com.app.colibri.view.util.ViewUtil.msgWarningCode;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -19,10 +20,31 @@ import java.util.List;
 import javax.swing.JTextField;
 
 import com.app.colibri.model.Word;
+import com.app.colibri.service.AppSettings;
 import com.app.colibri.view.GUI;
 import com.app.colibri.view.panels.EditPanel;
 
 public class GUIController {
+
+	public static boolean canWordAction() {
+
+		if (AppSettings.appSettings.getUser().getId() == 0) {
+			return true;
+		}
+
+		if (RESTController.checkConnection()) {
+			if (RESTController.checkUserAuth()) {
+				return true;
+			} else {
+				msgWarningCode("relogin_web");
+			}
+		} else {
+			msgWarningCode("web_connention_error");
+		}
+
+		return false;
+
+	}
 
 	public static void repeateWords(final List<Word> repeatedWordList) {
 		repeatedWordList.clear();

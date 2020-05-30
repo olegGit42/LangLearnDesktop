@@ -146,6 +146,11 @@ public class EditPanel extends JPanel {
 		btnEdit.setMargin(new Insets(2, 2, 2, 2));
 		btnEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
+				if (!GUIController.canWordAction()) {
+					return;
+				}
+
 				editState = EditState.EDIT;
 				if (isDefinedWord()) {
 					if (tfEditWord.getText().trim().equals(tfWord.getText())
@@ -191,6 +196,11 @@ public class EditPanel extends JPanel {
 		btnDelete.setMargin(new Insets(2, 2, 2, 2));
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
+				if (!GUIController.canWordAction()) {
+					return;
+				}
+
 				editState = EditState.DELETE;
 				if (isDefinedWord()) {
 					if (askCode("ask_del")) {
@@ -634,6 +644,10 @@ public class EditPanel extends JPanel {
 		btnReplaceTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
+				if (!GUIController.canWordAction()) {
+					return;
+				}
+
 				String v_oldTag = tfTag.getText() == null || tfTag.getText().equals(getLocaledItem("All tags")) ? ""
 						: tfTag.getText();
 				String v_newTag = tfNewTag.getText() == null ? "" : tfNewTag.getText().toUpperCase().trim();
@@ -663,6 +677,11 @@ public class EditPanel extends JPanel {
 		addTrackedItem(bRemoveUnusedTags, "rem_unuse_tags");
 		bRemoveUnusedTags.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
+				if (!GUIController.canWordAction()) {
+					return;
+				}
+
 				if (askCode("ask_rem_unuse_tags")) {
 					WordController.userDataRegistry.getTagRegistry().removeAllTags();
 				}

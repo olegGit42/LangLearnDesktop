@@ -1,6 +1,7 @@
 package com.app.colibri.controller;
 
 import static com.app.colibri.controller.WordController.allWordsList;
+import static com.app.colibri.controller.WordController.getRoundedTimeToDay;
 import static com.app.colibri.controller.WordController.getRoundedTimeToMinute;
 import static com.app.colibri.controller.WordController.getTimeDelta;
 import static com.app.colibri.service.AppSettings.getLocaledItem;
@@ -49,7 +50,10 @@ public class GUIController {
 	public static void repeateWords(final List<Word> repeatedWordList) {
 		repeatedWordList.clear();
 		final long now = System.currentTimeMillis();
-		allWordsList.stream().filter(word -> now >= getRoundedTimeToMinute(word.getRegTime() + getTimeDelta(word.getBox())))
+		allWordsList.stream()
+				.filter(word -> (now >= getRoundedTimeToMinute(word.getRegTime() + getTimeDelta(word.getBox()))
+						&& (word.getBox() == 0 || word.getBox() == 1))
+						|| (now >= getRoundedTimeToDay(word.getRegTime() + getTimeDelta(word.getBox())) && word.getBox() > 1))
 				.forEach(repeatedWordList::add);
 	}
 

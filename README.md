@@ -7,6 +7,11 @@ Web part for ColibriDesktop
 # [RELEASE](https://wordkeeper.herokuapp.com)
 https://wordkeeper.herokuapp.com
 
+## v1.0.2.2
+New boxes added
+Show all day words, when box > 1
+Waiting only for boxes 0 and 1
+
 ## v1.0.2.1
 Notification about web account save word  
 action when try save desktop app word

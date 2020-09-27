@@ -8,7 +8,7 @@ public class BoxTest extends Box {
 
 	@Test
 	public void test() {
-		assertEquals(Box.boxList.size(), 8);
+		assertEquals(Box.boxList.size(), Box.MAX_BOX + 1);
 	}
 
 }

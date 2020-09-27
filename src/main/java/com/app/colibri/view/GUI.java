@@ -49,10 +49,8 @@ import javax.swing.table.TableModel;
 import com.app.colibri.controller.GUIController;
 import com.app.colibri.controller.RESTController;
 import com.app.colibri.controller.WordController;
-import com.app.colibri.model.Box;
 import com.app.colibri.model.Word;
 import com.app.colibri.model.tablemodel.AllWordsTableModel;
-import com.app.colibri.model.tablemodel.BoxesTableModel;
 import com.app.colibri.model.tablemodel.RepeateTableModel;
 import com.app.colibri.registry.UserDataRegistry;
 import com.app.colibri.service.AppRun;
@@ -62,7 +60,6 @@ import com.app.colibri.service.NotificationSound;
 import com.app.colibri.view.buttons.RefreshButton;
 import com.app.colibri.view.chart.BadRememberWordChartFactory;
 import com.app.colibri.view.listeners.TextFieldClipboardMouseAdapter;
-import com.app.colibri.view.panels.BoxScrollPane;
 import com.app.colibri.view.panels.EditPanel;
 
 public class GUI {
@@ -429,8 +426,8 @@ public class GUI {
 							boxValueRep.setText(" " + getBoxInfo(WordController.allWordsList.get(i)));
 							if (WordController.allWordsList.get(i).getBox() + 1 < newBoxText.getItemCount()) {
 								newBoxText.setSelectedIndex(WordController.allWordsList.get(i).getBox() + 1);
-							} else if (WordController.allWordsList.get(i).getBox() == 7) {
-								newBoxText.setSelectedIndex(7);
+							} else if (WordController.allWordsList.get(i).getBox() == newBoxText.getItemCount() - 1) {
+								newBoxText.setSelectedIndex(newBoxText.getItemCount() - 1);
 							} else {
 								newBoxText.setSelectedIndex(-1);
 							}
@@ -472,7 +469,7 @@ public class GUI {
 		pSaveRepeatButtons.add(bSaveRep);
 		bSaveRep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (0 <= newBoxText.getSelectedIndex() && newBoxText.getSelectedIndex() <= 7
+				if (0 <= newBoxText.getSelectedIndex() && newBoxText.getSelectedIndex() <= newBoxText.getItemCount() - 1
 						&& !translateRepText.getText().trim().equals("")) {
 
 					if (!GUIController.canWordAction()) {
@@ -549,58 +546,51 @@ public class GUI {
 
 		// ----------[repeate_end]
 
-		JPanel boxesMain = new JPanel(new BorderLayout());
+		// JPanel boxesMain = new JPanel(new BorderLayout());
 
 		// ----------[boxes_begin]
 
-		JPanel boxes = new JPanel(new FlowLayout(JLabel.CENTER, 0, 0));
-
-		boxesMain.add(boxes, BorderLayout.CENTER);
-
-		// B0
-		BoxScrollPane scrollPaneTableB0 = new BoxScrollPane(new BoxesTableModel(Box.getBox(0), "Box 0"));
-		boxes.add(scrollPaneTableB0);
-
-		// B1
-		BoxScrollPane scrollPaneTableB1 = new BoxScrollPane(new BoxesTableModel(Box.getBox(1), "Box 1"));
-		boxes.add(scrollPaneTableB1);
-
-		// B2
-		BoxScrollPane scrollPaneTableB2 = new BoxScrollPane(new BoxesTableModel(Box.getBox(2), "Box 2"));
-		boxes.add(scrollPaneTableB2);
-
-		// B3
-		BoxScrollPane scrollPaneTableB3 = new BoxScrollPane(new BoxesTableModel(Box.getBox(3), "Box 3"));
-		boxes.add(scrollPaneTableB3);
-
-		// B4
-		BoxScrollPane scrollPaneTableB4 = new BoxScrollPane(new BoxesTableModel(Box.getBox(4), "Box 4"));
-		boxes.add(scrollPaneTableB4);
-
-		// B5
-		BoxScrollPane scrollPaneTableB5 = new BoxScrollPane(new BoxesTableModel(Box.getBox(5), "Box 5"));
-		boxes.add(scrollPaneTableB5);
-
-		// B6
-		BoxScrollPane scrollPaneTableB6 = new BoxScrollPane(new BoxesTableModel(Box.getBox(6), "Box 6"));
-		boxes.add(scrollPaneTableB6);
-
-		// Refresh
-		List<JTable> tableBoxesList = new ArrayList<>();
-		tableBoxesList.add(scrollPaneTableB0.getTable());
-		tableBoxesList.add(scrollPaneTableB1.getTable());
-		tableBoxesList.add(scrollPaneTableB2.getTable());
-		tableBoxesList.add(scrollPaneTableB3.getTable());
-		tableBoxesList.add(scrollPaneTableB4.getTable());
-		tableBoxesList.add(scrollPaneTableB5.getTable());
-		tableBoxesList.add(scrollPaneTableB6.getTable());
-
-		for (int i = 0; i < tableBoxesList.size(); i++) {
-			addTrackedItem(tableBoxesList.get(i), "Box " + i);
-		}
-
-		JButton refreshBoxes = new RefreshButton(Box::refreshBox, tableBoxesList);
-		boxesMain.add(refreshBoxes, BorderLayout.NORTH);
+		/*
+		 * JPanel boxes = new JPanel(new FlowLayout(JLabel.CENTER, 0, 0));
+		 * 
+		 * boxesMain.add(boxes, BorderLayout.CENTER);
+		 * 
+		 * // B0 BoxScrollPane scrollPaneTableB0 = new BoxScrollPane(new
+		 * BoxesTableModel(Box.getBox(0), "Box 0")); boxes.add(scrollPaneTableB0);
+		 * 
+		 * // B1 BoxScrollPane scrollPaneTableB1 = new BoxScrollPane(new
+		 * BoxesTableModel(Box.getBox(1), "Box 1")); boxes.add(scrollPaneTableB1);
+		 * 
+		 * // B2 BoxScrollPane scrollPaneTableB2 = new BoxScrollPane(new
+		 * BoxesTableModel(Box.getBox(2), "Box 2")); boxes.add(scrollPaneTableB2);
+		 * 
+		 * // B3 BoxScrollPane scrollPaneTableB3 = new BoxScrollPane(new
+		 * BoxesTableModel(Box.getBox(3), "Box 3")); boxes.add(scrollPaneTableB3);
+		 * 
+		 * // B4 BoxScrollPane scrollPaneTableB4 = new BoxScrollPane(new
+		 * BoxesTableModel(Box.getBox(4), "Box 4")); boxes.add(scrollPaneTableB4);
+		 * 
+		 * // B5 BoxScrollPane scrollPaneTableB5 = new BoxScrollPane(new
+		 * BoxesTableModel(Box.getBox(5), "Box 5")); boxes.add(scrollPaneTableB5);
+		 * 
+		 * // B6 BoxScrollPane scrollPaneTableB6 = new BoxScrollPane(new
+		 * BoxesTableModel(Box.getBox(6), "Box 6")); boxes.add(scrollPaneTableB6);
+		 * 
+		 * // Refresh List<JTable> tableBoxesList = new ArrayList<>();
+		 * tableBoxesList.add(scrollPaneTableB0.getTable());
+		 * tableBoxesList.add(scrollPaneTableB1.getTable());
+		 * tableBoxesList.add(scrollPaneTableB2.getTable());
+		 * tableBoxesList.add(scrollPaneTableB3.getTable());
+		 * tableBoxesList.add(scrollPaneTableB4.getTable());
+		 * tableBoxesList.add(scrollPaneTableB5.getTable());
+		 * tableBoxesList.add(scrollPaneTableB6.getTable());
+		 * 
+		 * for (int i = 0; i < tableBoxesList.size(); i++) {
+		 * addTrackedItem(tableBoxesList.get(i), "Box " + i); }
+		 * 
+		 * JButton refreshBoxes = new RefreshButton(Box::refreshBox, tableBoxesList);
+		 * boxesMain.add(refreshBoxes, BorderLayout.NORTH);
+		 */
 
 		// ----------[boxes_end]
 
@@ -634,8 +624,8 @@ public class GUI {
 		tableAllWords.getColumnModel().getColumn(5).setMinWidth(45);
 
 		tableAllWords.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
-		tableAllWords.getColumnModel().getColumn(6).setMaxWidth(55);
-		tableAllWords.getColumnModel().getColumn(6).setMinWidth(55);
+		tableAllWords.getColumnModel().getColumn(6).setMaxWidth(60);
+		tableAllWords.getColumnModel().getColumn(6).setMinWidth(60);
 
 		JButton refreshAllWords = new RefreshButton(tableAllWords);
 		allWords.add(refreshAllWords, BorderLayout.NORTH);
@@ -645,12 +635,12 @@ public class GUI {
 		// --------------------------------------------------[Panels_end]
 
 		JTabbedPane tabbedPane = new JTabbedPane();
-		addTrackedItem(tabbedPane, "Repeat", "Bad remembered words", "Boxes", "All words", "Editor");
+		addTrackedItem(tabbedPane, "Repeat", "Bad remembered words", /* "Boxes", */ "All words", "Editor");
 		mainPanel.add(tabbedPane);
 		tabbedPane.setPreferredSize(new Dimension(800, 600));
 		tabbedPane.add("Repeat", repeat);
 		tabbedPane.add("Bad remembered words", BadRememberWordChartFactory.chartPanelWithButton);
-		tabbedPane.add("Boxes", boxesMain);
+		// tabbedPane.add("Boxes", boxesMain);
 		tabbedPane.add("All words", allWords);
 		tabbedPane.add("Editor", new EditPanel());
 

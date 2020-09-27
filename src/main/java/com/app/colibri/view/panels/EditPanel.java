@@ -48,13 +48,14 @@ import javax.swing.table.TableModel;
 
 import com.app.colibri.controller.GUIController;
 import com.app.colibri.controller.WordController;
+import com.app.colibri.model.Box;
 import com.app.colibri.model.Word;
 import com.app.colibri.model.tablemodel.SearchTableModel;
 import com.app.colibri.view.listeners.TextFieldClipboardMouseAdapter;
 
 @SuppressWarnings("serial")
 public class EditPanel extends JPanel {
-	public static final int[] wordsCountArray = new int[8];
+	public static final int[] wordsCountArray = new int[Box.MAX_BOX + 1];
 	public static int wordsCount;
 
 	public static int getWordsCount() {
@@ -102,6 +103,9 @@ public class EditPanel extends JPanel {
 	private JComboBox cmbFindTag;
 	private JTextField tfTag;
 	private JTextField tfNewTag;
+	private JLabel lblCountB10;
+	private JLabel lblCountB9;
+	private JLabel lblCountB8;
 
 	/**
 	 * Create the panel.
@@ -324,133 +328,154 @@ public class EditPanel extends JPanel {
 
 		JPanel pnlWordsSummary = new JPanel();
 		pnlWordsSummary.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-		pnlWordsSummary.setBounds(24, 340, 450, 60);
+		pnlWordsSummary.setBounds(-2, 340, 495, 60);
 		panelCenter.add(pnlWordsSummary);
 		pnlWordsSummary.setLayout(null);
 
-		JLabel lblBoxCount = new JLabel("Box");
-		addTrackedItem(lblBoxCount, "Box");
-		lblBoxCount.setBounds(0, 12, 50, 14);
-		pnlWordsSummary.add(lblBoxCount);
-		lblBoxCount.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblBoxCount.setFont(new Font("Tahoma", Font.PLAIN, 12));
-
-		JLabel lblCount = new JLabel("Count");
-		addTrackedItem(lblCount, "Count");
-		lblCount.setBounds(0, 31, 50, 14);
-		pnlWordsSummary.add(lblCount);
-		lblCount.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblCount.setFont(new Font("Tahoma", Font.PLAIN, 12));
-
 		JLabel lbl0 = new JLabel("0");
-		lbl0.setBounds(60, 12, 40, 14);
+		lbl0.setBounds(0, 12, 40, 14);
 		pnlWordsSummary.add(lbl0);
 		lbl0.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl0.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB0 = new JLabel("0");
-		lblCountB0.setBounds(60, 32, 40, 14);
+		lblCountB0.setBounds(0, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB0);
 		lblCountB0.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB0.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lbl3 = new JLabel("3");
-		lbl3.setBounds(186, 12, 40, 14);
+		lbl3.setBounds(126, 12, 40, 14);
 		pnlWordsSummary.add(lbl3);
 		lbl3.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lbl2 = new JLabel("2");
-		lbl2.setBounds(144, 12, 40, 14);
+		lbl2.setBounds(84, 12, 40, 14);
 		pnlWordsSummary.add(lbl2);
 		lbl2.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lbl1 = new JLabel("1");
-		lbl1.setBounds(101, 12, 40, 14);
+		lbl1.setBounds(41, 12, 40, 14);
 		pnlWordsSummary.add(lbl1);
 		lbl1.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB1 = new JLabel("0");
-		lblCountB1.setBounds(101, 32, 40, 14);
+		lblCountB1.setBounds(41, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB1);
 		lblCountB1.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB2 = new JLabel("0");
-		lblCountB2.setBounds(144, 32, 40, 14);
+		lblCountB2.setBounds(84, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB2);
 		lblCountB2.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB3 = new JLabel("0");
-		lblCountB3.setBounds(186, 32, 40, 14);
+		lblCountB3.setBounds(126, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB3);
 		lblCountB3.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lbl4 = new JLabel("4");
-		lbl4.setBounds(227, 12, 40, 14);
+		lbl4.setBounds(167, 12, 40, 14);
 		pnlWordsSummary.add(lbl4);
 		lbl4.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB4 = new JLabel("0");
-		lblCountB4.setBounds(227, 32, 40, 14);
+		lblCountB4.setBounds(167, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB4);
 		lblCountB4.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
-		JLabel lblArchive = new JLabel("Archive");
-		addTrackedItem(lblArchive, "period_box_7");
-		lblArchive.setBounds(353, 12, 40, 14);
-		pnlWordsSummary.add(lblArchive);
-		lblArchive.setHorizontalAlignment(SwingConstants.CENTER);
-		lblArchive.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		JLabel lbl7 = new JLabel("7");
+		lbl7.setBounds(293, 12, 40, 14);
+		pnlWordsSummary.add(lbl7);
+		lbl7.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl7.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lbl6 = new JLabel("6");
-		lbl6.setBounds(311, 12, 40, 14);
+		lbl6.setBounds(251, 12, 40, 14);
 		pnlWordsSummary.add(lbl6);
 		lbl6.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl6.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lbl5 = new JLabel("5");
-		lbl5.setBounds(268, 12, 40, 14);
+		lbl5.setBounds(208, 12, 40, 14);
 		pnlWordsSummary.add(lbl5);
 		lbl5.setHorizontalAlignment(SwingConstants.CENTER);
 		lbl5.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB5 = new JLabel("0");
-		lblCountB5.setBounds(268, 32, 40, 14);
+		lblCountB5.setBounds(208, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB5);
 		lblCountB5.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB5.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB6 = new JLabel("0");
-		lblCountB6.setBounds(311, 32, 40, 14);
+		lblCountB6.setBounds(251, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB6);
 		lblCountB6.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB6.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountB7 = new JLabel("0");
-		lblCountB7.setBounds(353, 32, 40, 14);
+		lblCountB7.setBounds(293, 32, 40, 14);
 		pnlWordsSummary.add(lblCountB7);
 		lblCountB7.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountB7.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		JLabel lblAll = new JLabel("All");
 		addTrackedItem(lblAll, "All");
-		lblAll.setBounds(400, 12, 40, 14);
+		lblAll.setBounds(455, 12, 40, 14);
 		pnlWordsSummary.add(lblAll);
 		lblAll.setHorizontalAlignment(SwingConstants.CENTER);
 		lblAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		lblCountAll = new JLabel("0");
-		lblCountAll.setBounds(400, 32, 40, 14);
+		lblCountAll.setBounds(455, 32, 40, 14);
 		pnlWordsSummary.add(lblCountAll);
 		lblCountAll.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountAll.setFont(new Font("Tahoma", Font.PLAIN, 12));
+
+		JLabel lbl10 = new JLabel("10");
+		lbl10.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl10.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl10.setBounds(415, 12, 40, 14);
+		pnlWordsSummary.add(lbl10);
+
+		lblCountB10 = new JLabel("0");
+		lblCountB10.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB10.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB10.setBounds(415, 32, 40, 14);
+		pnlWordsSummary.add(lblCountB10);
+
+		JLabel lbl9 = new JLabel("9");
+		lbl9.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl9.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl9.setBounds(373, 12, 40, 14);
+		pnlWordsSummary.add(lbl9);
+
+		lblCountB9 = new JLabel("0");
+		lblCountB9.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB9.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB9.setBounds(373, 32, 40, 14);
+		pnlWordsSummary.add(lblCountB9);
+
+		JLabel lbl8 = new JLabel("8");
+		lbl8.setHorizontalAlignment(SwingConstants.CENTER);
+		lbl8.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lbl8.setBounds(333, 12, 40, 14);
+		pnlWordsSummary.add(lbl8);
+
+		lblCountB8 = new JLabel("0");
+		lblCountB8.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCountB8.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblCountB8.setBounds(333, 32, 40, 14);
+		pnlWordsSummary.add(lblCountB8);
 
 		JLabel lblEditBox = new JLabel("Box");
 		addTrackedItem(lblEditBox, "Box");
@@ -875,9 +900,11 @@ public class EditPanel extends JPanel {
 
 		final String wordStr = word == null ? null : word.getWord();
 		final String translateStr = word == null ? null : word.getTranslate();
-		final String creationDateStr = word == null ? null : WordController.dateFormat.format(new Date(word.getCreationTime()));
+		final String creationDateStr = word == null ? null
+				: WordController.dateMinuteFormat.format(new Date(word.getCreationTime()));
 		final String repeateDateStr = word == null ? null
-				: WordController.dateFormat.format(new Date(word.getRegTime() + WordController.getTimeDelta(word.getBox())));
+				: WordController.dateMinuteFormat
+						.format(new Date(word.getRegTime() + WordController.getTimeDelta(word.getBox())));
 		final String boxStr = word == null ? null : getBoxInfo(word);
 		final String repeateCountStr = word == null ? null : String.valueOf(word.getRepeateIndicator());
 		final String idStr = word == null ? null : String.valueOf(word.getId());
@@ -946,6 +973,9 @@ public class EditPanel extends JPanel {
 		lblCountB5.setText(String.valueOf(wordsCountArray[5]));
 		lblCountB6.setText(String.valueOf(wordsCountArray[6]));
 		lblCountB7.setText(String.valueOf(wordsCountArray[7]));
+		lblCountB8.setText(String.valueOf(wordsCountArray[8]));
+		lblCountB9.setText(String.valueOf(wordsCountArray[9]));
+		lblCountB10.setText(String.valueOf(wordsCountArray[10]));
 		lblCountAll.setText(String.valueOf(getWordsCount()));
 	}
 

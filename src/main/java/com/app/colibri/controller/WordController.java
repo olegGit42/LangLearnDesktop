@@ -46,6 +46,21 @@ public class WordController {
 	public static UserDataRegistry userDataRegistry;
 
 	static {
+		timeDeltaArray = new long[Box.MAX_BOX + 1];
+		timeDeltaArray[0] = minute_ms * 2;
+		timeDeltaArray[1] = minute_ms * 10;
+		timeDeltaArray[2] = day_ms;
+		timeDeltaArray[3] = day_ms * 3;
+		timeDeltaArray[4] = day_ms * 5;
+		timeDeltaArray[5] = week_ms;
+		timeDeltaArray[6] = week_ms * 2;
+		timeDeltaArray[7] = week_ms * 3;
+		timeDeltaArray[8] = month_ms;
+		timeDeltaArray[9] = month_ms * 2;
+		timeDeltaArray[10] = month_6_ms;
+		timeDeltaArray[11] = year_ms;
+		timeDeltaArray[12] = year_ms * 2;
+
 		repeatPeriodArray = new String[Box.MAX_BOX + 1];
 		repeatPeriodArray[0] = "period_box_0";
 		repeatPeriodArray[1] = "period_box_1";
@@ -58,19 +73,8 @@ public class WordController {
 		repeatPeriodArray[8] = "period_box_8";
 		repeatPeriodArray[9] = "period_box_9";
 		repeatPeriodArray[10] = "period_box_10";
-
-		timeDeltaArray = new long[Box.MAX_BOX + 1];
-		timeDeltaArray[0] = minute_ms * 2;
-		timeDeltaArray[1] = minute_ms * 10;
-		timeDeltaArray[2] = day_ms;
-		timeDeltaArray[3] = day_ms * 3;
-		timeDeltaArray[4] = week_ms;
-		timeDeltaArray[5] = week_ms * 2;
-		timeDeltaArray[6] = month_ms;
-		timeDeltaArray[7] = month_ms * 2;
-		timeDeltaArray[8] = month_6_ms;
-		timeDeltaArray[9] = year_ms;
-		timeDeltaArray[10] = year_ms * 2;
+		repeatPeriodArray[11] = "period_box_11";
+		repeatPeriodArray[12] = "period_box_12";
 
 		boxPeriod = new String[WordController.repeatPeriodArray.length];
 		for (int i = 0; i < boxPeriod.length; i++) {

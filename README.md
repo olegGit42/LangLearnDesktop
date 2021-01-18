@@ -7,6 +7,9 @@ Web part for ColibriDesktop
 # [RELEASE](https://wordkeeper.herokuapp.com)
 https://wordkeeper.herokuapp.com
 
+## v1.0.2.3
+New boxes added (12 max)
+
 ## v1.0.2.2
 New boxes added
 Show all day words, when box > 1

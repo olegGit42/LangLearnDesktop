@@ -8,7 +8,7 @@ import com.app.colibri.controller.WordController;
 
 public class Box {
 
-	public static final int MAX_BOX = 10;
+	public static final int MAX_BOX = 12;
 	public static final List<List<Word>> boxList = new ArrayList<>();
 
 	static {
